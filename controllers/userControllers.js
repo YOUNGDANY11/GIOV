@@ -133,6 +133,32 @@ const getByLastName = async(req,res)=>{
     }
 }
 
+const getByUserActive = async(req,res)=>{
+    try{
+        const {id} = req.user
+        const id_user = id
+        const user = await userModel.getById(id_user)
+        if(!user){
+            return res.status(404).json({
+                status:'Error',
+                mensaje:'Usuario no existente'
+            })
+        }
+        const { document, password, created_at, updated_at, ...safeUser } = user
+
+        return res.status(200).json({
+            status:'Success',
+            mensaje:'Consulta exitosa',
+            usuario:safeUser
+        })
+    }catch(error){ 
+        return res.status(500).json({
+            status:'Error',
+            mensaje:'No se pudo obtener la informacion de este usuario'
+        })
+    }
+}
+
 const create = async(req,res) =>{
     try{
         const {name,lastname,document,password,id_role} = req.body
@@ -245,6 +271,7 @@ module.exports = {
     getByDocument,
     getByName,
     getByLastName,
+    getByUserActive,
     create,
     update,
     deleteUser

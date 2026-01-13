@@ -15,4 +15,6 @@ router.post('/', auth, roleMiddleware(1), userController.create)
 router.put('/:id', auth, roleMiddleware(1), userController.update)
 router.delete('/:id',auth, roleMiddleware(1), userController.deleteUser)
 
+//User normal
+router.get('/active', auth, userController.getByUserActive)
 module.exports = router
