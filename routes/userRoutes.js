@@ -2,17 +2,17 @@ const express = require('express')
 const router = express.Router()
 
 const userController = require('../controllers/userControllers')
+const auth = require('../middlewares/auth.middleware')
+const roleMiddleware = require('../middlewares/role.middleware')
 
-router.get('/', userController.getAll)
-router.get('/id/:id', userController.getById)
-router.get('/document', userController.getByDocument)
-router.get('/name', userController.getByName)
-router.get('/lastname', userController.getByLastName)
-
-router.post('/', userController.create)
-
-router.put('/:id', userController.update)
-
-router.delete('/:id', userController.deleteUser)
+//Admin
+router.get('/', auth, roleMiddleware(1),userController.getAll)
+router.get('/id/:id', auth, roleMiddleware(1),userController.getById)
+router.get('/document', auth, roleMiddleware(1), userController.getByDocument)
+router.get('/name', auth, roleMiddleware(1),userController.getByName)
+router.get('/lastname', auth, roleMiddleware(1),userController.getByLastName)
+router.post('/', auth, roleMiddleware(1), userController.create)
+router.put('/:id', auth, roleMiddleware(1), userController.update)
+router.delete('/:id',auth, roleMiddleware(1), userController.deleteUser)
 
 module.exports = router
