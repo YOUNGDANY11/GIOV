@@ -1,0 +1,40 @@
+const pool = require('../config/db')
+
+const getAll = async() =>{
+    const result = await pool.query('SELECT * FROM documents')
+    return result.rows
+}
+
+const getById = async(id_document) =>{
+    const result = await pool.query('SELECT * FROM documents WHERE id_document = $1',[id_document])
+    return result.rows[0]
+}
+
+const getByUserId = async(id_user)=>{
+    const result = await pool.query('SELECT * FROM documentes WHERE id_user = $1',[id_user])
+    return result.rows[0]
+}
+
+const create = async(id_user,name,description, document) =>{
+    const result = await pool.query('INSERT INTO documents (id_user,name,description,document) VALUES ($1,$2,$3,$4) RETURNING *',[id_user,name,description, document])
+    return result.rows[0]
+}
+
+const update = async(name,description,document,id_document) => {
+    const result = await pool.query('UPDATE documents SET name = $1, description = $2, document = $3, updated_at = NOW() WHERE id_document = $4 RETURNING *',[name,description,document,id_document])
+    return result.rows[0]
+}
+
+const deleteDocument = async(id_document) => {
+    const result = await pool.query('DELETE FROM documents WHERE id_document = $1 RETURNING *',[id_document])
+    return result.rows[0]
+}
+
+module.exports = {
+    getAll,
+    getById,
+    getByUserId,
+    create,
+    update,
+    deleteDocument
+}

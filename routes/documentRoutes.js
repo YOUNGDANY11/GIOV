@@ -1,0 +1,16 @@
+const express = require('express')
+const router = express.Router()
+
+const documentController = require('../controllers/documentController')
+const auth = require('../middlewares/auth.middleware')
+const roleMiddleware = require('../middlewares/role.middleware')
+const { documentUpload } = require('../middlewares/upfile.middleware')
+
+//Admin
+router.get('/', auth,roleMiddleware(1), documentController.getAll)
+router.get('/id/:id', auth, roleMiddleware(1), documentController.getById)
+router.post('/', auth, roleMiddleware(1), documentUpload.single('document'), documentController.create)
+router.put('/id/:id', auth, roleMiddleware(1), documentUpload.single('document'), documentController.update)
+router.delete('/id/:id', auth, roleMiddleware(1), documentController.deleteDocument)
+
+module.exports = router

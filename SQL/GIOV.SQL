@@ -20,6 +20,7 @@ CREATE TABLE documents(
     id_user BIGINT NOT NULL REFERENCES users(id_user) ON DELETE CASCADE ON UPDATE CASCADE,
     name VARCHAR(100) NOT NULL,
     description VARCHAR(100),
+    document text NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
