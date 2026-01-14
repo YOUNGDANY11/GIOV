@@ -22,7 +22,7 @@ const register = async(req,res)=>{
 
         const hashedPassword = await bcrypt.hash(password,10)
 
-        const user = await userModel.create(name,lastname,document,hashedPassword,id_role || 3)
+        const user = await userModel.create(name,lastname,document,hashedPassword,id_role || 9)
         return res.status(200).json({
             status:'Success',
             mensaje:'Usuario creado exitosamente',
