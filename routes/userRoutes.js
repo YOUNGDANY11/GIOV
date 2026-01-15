@@ -4,6 +4,7 @@ const router = express.Router()
 const userController = require('../controllers/userControllers')
 const auth = require('../middlewares/auth.middleware')
 const roleMiddleware = require('../middlewares/role.middleware')
+const { imageUpload } = require('../middlewares/upfile.middleware')
 
 //Admin
 router.get('/', auth, roleMiddleware(1),userController.getAll)
@@ -17,4 +18,6 @@ router.delete('/:id',auth, roleMiddleware(1), userController.deleteUser)
 
 //User normal
 router.get('/active', auth, userController.getByUserActive)
+router.put('/active/avatar', auth, imageUpload.fields([{ name: 'image', maxCount: 1 }]), userController.updateByUser)
+
 module.exports = router

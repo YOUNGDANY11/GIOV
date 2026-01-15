@@ -10,6 +10,7 @@ CREATE TABLE users(
     lastname VARCHAR(100) NOT NULL,
     document VARCHAR(10) NOT NULL,
     password VARCHAR(255) NOT NULL,
+    avatar text,
     id_role INT NOT NULL REFERENCES roles(id_role) ON DELETE CASCADE ON UPDATE CASCADE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

@@ -35,6 +35,11 @@ const update = async(name,lastname,document,hashedPassword,id_role,id_user) => {
     return result.rows[0]
 }
 
+const updateImage = async(avatar, id_user) =>{
+    const result = await pool.query('UPDATE users SET avatar = $1 WHERE id_user = $2 RETURNING *',[avatar,id_user])
+    return result.rows[0]
+}
+
 const deleteUser = async(id_user) => {
     const result = await pool.query('DELETE FROM users WHERE id_user = $1 RETURNING *',[id_user])
     return result.rows[0]
@@ -48,5 +53,6 @@ module.exports = {
     getByLastName,
     create,
     update,
+    updateImage,
     deleteUser
 }

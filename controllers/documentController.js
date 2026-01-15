@@ -61,7 +61,8 @@ const getById = async(req,res)=>{
 
 const create = async (req, res) => {
     try {
-        const id_user = req.user.id
+        const {id} = req.user
+        const id_user = id  
         const { name, description } = req.body
         const file = req.file
 
