@@ -29,14 +29,23 @@ CREATE TABLE documents(
 CREATE TABLE athletes(
     id_athlete BIGSERIAL PRIMARY KEY,
     id_user BIGINT NOT NULL REFERENCES users(id_user) ON DELETE CASCADE ON UPDATE CASCADE,
-    id_role INT NOT NULL REFERENCES roles(id_role) ON DELETE CASCADE ON UPDATE CASCADE,
     date DATE NOT NULL,
     foot VARCHAR(20) NOT NULL,
     address VARCHAR(100) NOT NULL,
-    blood_type VARCHAR(20) NOT NULL,
+    blood_type VARCHAR(10) NOT NULL,
     stature VARCHAR(10) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE staff(
+    id_staff BIGSERIAL PRIMARY KEY,
+    id_user BIGINT NOT NULL REFERENCES users(id_user) ON DELETE CASCADE ON UPDATE CASCADE,
+    date DATE NOT NULL,
+    address VARCHAR(100) NOT NULL,
+    blood_type VARCHAR(10) NOT NULL,
+    information VARCHAR(100) NOT NULL,
+    description VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE personal_information(

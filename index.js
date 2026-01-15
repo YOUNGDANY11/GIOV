@@ -7,6 +7,7 @@ const userRoutes = require('./routes/userRoutes')
 const authRoutes = require('./routes/authRoutes')
 const roleRoutes = require('./routes/rolesRoutes')
 const documentRoutes = require('./routes/documentRoutes')
+const athleteRoutes = require('./routes/athleteRoutes')
 
 const app = express()
 const PORT = process.env.PORT
@@ -20,6 +21,7 @@ app.use('/api/users',userRoutes)
 app.use('/api/auth',authRoutes)
 app.use('/api/roles',roleRoutes)
 app.use('/api/documents',documentRoutes)
+app.use('/api/athletes',athleteRoutes)
 
 app.listen(PORT,() =>{
     console.log(`Server corriendo en el puerto ${PORT}`)
