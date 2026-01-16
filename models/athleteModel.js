@@ -1,22 +1,22 @@
 const pool = require('../config/db')
 
 const getAll = async() =>{
-    const result = await pool.query(`SELECT  a.*, u.name AS user_name, u.lastname AS user_lastname, u.document AS user_document FROM athletes a INNER JOIN users u ON u.id_user = a.id_user`)
+    const result = await pool.query(`SELECT  a.*, u.name AS name, u.lastname AS lastname, u.document AS user_document FROM athletes a INNER JOIN users u ON u.id_user = a.id_user`)
     return result.rows
 }
 
 const getById = async(id_athlete) =>{
-    const result = await pool.query(`SELECT  a.*, u.name AS user_name, u.lastname AS user_lastname, u.document AS user_document FROM athletes a INNER JOIN users u ON u.id_user = a.id_user WHERE a.id_athlete = $1`, [id_athlete])
+    const result = await pool.query(`SELECT  a.*, u.name AS name, u.lastname AS lastname, u.document AS user_document FROM athletes a INNER JOIN users u ON u.id_user = a.id_user WHERE a.id_athlete = $1`, [id_athlete])
     return result.rows[0]
 }
 
 const getByUserId = async(id_user) =>{
-    const result = await pool.query(`SELECT  a.*, u.name AS user_name, u.lastname AS user_lastname, u.document AS user_document FROM athletes a INNER JOIN users u ON u.id_user = a.id_user WHERE a.id_user = $1`,[id_user])
+    const result = await pool.query(`SELECT  a.*, u.name AS name, u.lastname AS lastname, u.document AS user_document FROM athletes a INNER JOIN users u ON u.id_user = a.id_user WHERE a.id_user = $1`,[id_user])
     return result.rows[0]
 }
 
 const getByUserDocument = async(document) =>{
-    const result = await pool.query(`SELECT  a.*, u.name AS user_name, u.lastname AS user_lastname, u.document AS user_document FROM athletes a INNER JOIN users u ON u.id_user = a.id_user WHERE u.document = $1`, [document])
+    const result = await pool.query(`SELECT  a.*, u.name AS name, u.lastname AS lastname, u.document AS user_document FROM athletes a INNER JOIN users u ON u.id_user = a.id_user WHERE u.document = $1`, [document])
     return result.rows[0]
 }
 
@@ -25,17 +25,17 @@ const getByDate = async(year)=>{
     if (Number.isNaN(birthYear)) {
         return []
     }
-    const result = await pool.query(`SELECT  a.*, u.name AS user_name, u.lastname AS user_lastname, u.document AS user_document FROM athletes a INNER JOIN users u ON u.id_user = a.id_user WHERE EXTRACT(YEAR FROM a.date) = $1`,[birthYear])
+    const result = await pool.query(`SELECT  a.*, u.name AS name, u.lastname AS lastname, u.document AS user_document FROM athletes a INNER JOIN users u ON u.id_user = a.id_user WHERE EXTRACT(YEAR FROM a.date) = $1`,[birthYear])
     return result.rows
 }
 
 const getByStature = async(stature) =>{
-    const result = await pool.query(`SELECT  a.*, u.name AS user_name, u.lastname AS user_lastname, u.document AS user_document FROM athletes a INNER JOIN users u ON u.id_user = a.id_user WHERE a.stature::text ILIKE $1`, [`%${stature}%`])
+    const result = await pool.query(`SELECT  a.*, u.name AS name, u.lastname AS lastname, u.document AS user_document FROM athletes a INNER JOIN users u ON u.id_user = a.id_user WHERE a.stature::text ILIKE $1`, [`%${stature}%`])
     return result.rows
 }
 
 const getByFoot = async(foot) =>{
-    const result = await pool.query(`SELECT  a.*, u.name AS user_name, u.lastname AS user_lastname, u.document AS user_document FROM athletes a INNER JOIN users u ON u.id_user = a.id_user WHERE a.foot ILIKE $1`,[`%${foot}%`])
+    const result = await pool.query(`SELECT  a.*, u.name AS name, u.lastname AS lastname, u.document AS user_document FROM athletes a INNER JOIN users u ON u.id_user = a.id_user WHERE a.foot ILIKE $1`,[`%${foot}%`])
     return result.rows
 }
 
