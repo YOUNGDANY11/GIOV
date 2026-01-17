@@ -16,6 +16,7 @@ const getAll = async(req,res)=>{
             staff:staff
         })
     }catch(error){
+        console.log(error)
         return res.status(500).json({
             status:'Error',
             mensaje:'No se pudo obtener el cuerpo tecnico'
@@ -35,12 +36,13 @@ const getById = async(req,res)=>{
             })
         }
 
-        return res.stauts(200).json({
+        return res.status(200).json({
             stauts:'Success',
             mensaje:'Consulta exitosa',
             staff:staff
         })
     }catch(error){
+        console.log(error)
         return res.status(500).json({
             status:'Error',
             mensaje:'No se pudo obtener el integrante del cuerpo tecnico'
@@ -97,6 +99,7 @@ const getByUserActive = async(req,res) =>{
             staff:staff
         })
     }catch(error){
+        console.log(error)
         return res.status(500).json({
             status:'Error',
             mensaje:'No se pudo obtener el integrante del cuerpo tecnico'
@@ -115,14 +118,22 @@ const create = async(req,res)=>{
                 mensaje:'Es requerida toda la informacion'
             })
         }
+        const existsStaff = await staffModel.getByUserId(id_user)
+        if(existsStaff){
+            return res.status(400).json({
+                status:'Error',
+                mensaje:'Solo puede haber una caracterizacion por miembro'
+            })
+        }
 
-        const staff = await staffModel.create(date,address,blood_type,information,description)
+        const staff = await staffModel.create(id_user,date,address,blood_type,information,description)
         return res.status(200).json({
             status:'Success',
             mensaje:'Miembro creado con exito',
             staff:staff
         })
     }catch(error){
+        console.log(error)
         return res.status(500).json({
             status:'Error',
             mensaje:'No se pudo crear el integrante del cuerpo tecnico'

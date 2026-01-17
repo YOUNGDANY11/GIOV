@@ -7,12 +7,12 @@ const roleMiddleware = require('../middlewares/role.middleware')
 const { documentUpload } = require('../middlewares/upfile.middleware')
 
 //Admin
-router.get('/', auth,roleMiddleware(1), documentController.getAll)
-router.get('/id/:id', auth, roleMiddleware(1), documentController.getById)
+router.get('/', auth,roleMiddleware(1,2,3), documentController.getAll)
+router.get('/id/:id', auth, roleMiddleware(1,2,3), documentController.getById)
+router.put('/id/:id', auth, roleMiddleware(1,2,3), documentUpload.single('document'), documentController.update)
+router.delete('/id/:id', auth, roleMiddleware(1,2,3), documentController.deleteDocument)
 
-router.put('/id/:id', auth, roleMiddleware(1), documentUpload.single('document'), documentController.update)
-router.delete('/id/:id', auth, roleMiddleware(1), documentController.deleteDocument)
-
+//Deportistas y miembros del staff
 router.post('/', auth, documentUpload.single('document'), documentController.create)
 
 module.exports = router

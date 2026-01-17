@@ -59,6 +59,17 @@ const getById = async(req,res)=>{
     }
 }
 
+const getByUserDocument = async(req,res)=>{
+    try{
+
+    }catch(error){
+        return res.status(500).json({
+            status:'Error',
+            mensaje:'No se pudo obtener los documentos'
+        })
+    }
+}
+
 const create = async (req, res) => {
     try {
         const {id} = req.user
