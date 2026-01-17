@@ -61,8 +61,29 @@ const getById = async(req,res)=>{
 
 const getByUserDocument = async(req,res)=>{
     try{
+        const document = req.query?.document ?? req.body?.document
+        if(!document){
+            return res.status(400).json({
+                status:'Error',
+                mensaje:'Es requerido el numero de documento'
+            })
+        }
+        
+        const documents = await documentModel.getByUserDocument(document)
+        if(documents.length === 0){
+            return res.status(404).json({
+                status:'Error',
+                mensaje:'No hay documentos asociados a este usuario'
+            })
+        }
 
+        return res.status(200).json({
+            status:'Success',
+            mensaje:'Consulta exitosa',
+            documentos:documents
+        })
     }catch(error){
+        console.log(error)
         return res.status(500).json({
             status:'Error',
             mensaje:'No se pudo obtener los documentos'
@@ -211,6 +232,7 @@ const deleteDocument = async (req, res) => {
 module.exports = {
     getAll,
     getById,
+    getByUserDocument,
     create,
     update,
     deleteDocument
