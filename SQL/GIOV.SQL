@@ -26,6 +26,14 @@ CREATE TABLE documents(
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE categories(
+    id_categorie SERIAL PRIMARY KEY,
+    name VARCHAR(20) NOT NULL,
+    minAge INT(10) NOT NULL,
+    maxAge INT(10) NOT NULL,
+    description VARCHAR(100),
+);
+
 CREATE TABLE athletes(
     id_athlete BIGSERIAL PRIMARY KEY,
     id_user BIGINT NOT NULL REFERENCES users(id_user) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -34,6 +42,7 @@ CREATE TABLE athletes(
     address VARCHAR(100) NOT NULL,
     blood_type VARCHAR(10) NOT NULL,
     stature VARCHAR(10) NOT NULL,
+    categorie INT NOT NULL REFERENCES categories(id_categorie) ON DELETE CASCADE ON UPDATE CASCADE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -73,6 +82,26 @@ CREATE TABLE relatives(
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE competencies(
+    id_competencie BIGSERIAL PRIMARY KEY,
+    categorie INT NOT NULL REFERENCES categories(id_categorie) ON DELETE CASCADE ON UPDATE CASCADE,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(100) NOT NULL,
+    startDate DATE NOT NULL DEFAULT NOW(),
+    finisDate DATE,
+    status VARCHAR(10) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE athletes_in_competencies(
+    id_ath_comp BIGSERIAL PRIMARY KEY,
+    id_athlete BIGINT NOT NULL REFERENCES athletes(id_athlete) ON DELETE CASCADE ON UPDATE CASCADE,
+    id_competencie BIGINT NOT NULL REFERENCES competencies(id_competencie) ON DELETE CASCADE ON UPDATE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 
 -- INSERCIONES --
 INSERT INTO roles (id_role, name, code) VALUES 
@@ -85,3 +114,14 @@ INSERT INTO roles (id_role, name, code) VALUES
 (7, 'Quiropractico', 'QUIRO'),
 (8, 'Deportista', 'DEP'),
 (9, 'Usuario Normal', 'USER');
+
+INSERT INTO categories (name, minAge, maxAge, description) VALUES
+('U-7',  5,  7,  'Niños que comienzan a conocer el fútbol jugando'),
+('U-9',  8,  9,  'Aprenden a jugar en equipo y a controlar el balón'),
+('U-11', 10, 11, 'Mejoran su técnica y entienden las reglas del juego'),
+('U-13', 12, 13, 'Desarrollan habilidades y empiezan a competir'),
+('U-15', 14, 15, 'Competencia formativa con mayor exigencia'),
+('U-17', 16, 17, 'Preparación para competencias juveniles'),
+('U-20', 18, 20, 'Paso previo al fútbol profesional o universitario'),
+('U-23', 21, 23, 'Consolidación deportiva y alto rendimiento'),
+('Senior', 14, 99, 'Categoría de adultos y fútbol profesional');
