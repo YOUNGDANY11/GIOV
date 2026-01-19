@@ -68,7 +68,8 @@ CREATE TABLE relatives(
     email VARCHAR(100) NOT NULL,
     country VARCHAR(50) NOT NULL,
     deparment VARCHAR(50) NOT NULL,
-    city VARCHAR(50) NOT NULL,    
+    city VARCHAR(50) NOT NULL,
+    type VARCHAR(50) NOT NULL,    
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
