@@ -5,8 +5,8 @@ const getAll = async() =>{
     return result.rows
 }
 
-const getById = async(id_staff) =>{
-    const result = await pool.query(`SELECT  p.*, u.name AS name, u.lastname AS lastname, u.document AS document FROM personal_information p INNER JOIN users u ON u.id_user = p.id_user WHERE p.id_staff = $1`, [id_staff])
+const getById = async(id_per_inf) =>{
+    const result = await pool.query(`SELECT  p.*, u.name AS name, u.lastname AS lastname, u.document AS document FROM personal_information p INNER JOIN users u ON u.id_user = p.id_user WHERE p.id_per_inf = $1`, [id_per_inf])
     return result.rows[0]
 }
 

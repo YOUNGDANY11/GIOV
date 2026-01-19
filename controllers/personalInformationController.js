@@ -16,6 +16,7 @@ const getAll = async(req,res)=>{
             informacion_personal:personalInf
         })
     }catch(error){
+        console.log(error)
         return res.status(500).json({
             status:'Error',
             mensaje:'No es posible obtener la informacion personal'
@@ -41,6 +42,7 @@ const getById = async(req,res)=>{
             informacion_personal:personalInf
         })
     }catch(error){
+        console.log(error)
         return res.status(500).json({
             status:'Error',
             mensaje:'No es posible obtener la informacion personal'
@@ -76,6 +78,31 @@ const getByUserDocument = async(req,res)=>{
         return res.status(500).json({
             status:'Error',
             mensaje:'No es posible obtener la informacion personal'
+        })
+    }
+}
+
+const getByUserActive = async(req,res)=>{
+    try{
+        const {id} = req.user
+        const id_user = id
+        const personalInf = await personalInfModel.getByUserId(id_user)
+        if(!personalInf){
+            return res.status(404).json({
+                status:'Error',
+                mensaje:'No tienes informacion personal registrada'
+            })
+        }
+
+        return res.status(200).json({
+            status:'Success',
+            mensaje:'Consulta exitosa',
+            informacion_personal:personalInf
+        })
+    }catch(error){
+        return res.status(500).json({
+            status:'Error',
+            mensaje:'No es posible obtener la informacion'
         })
     }
 }
@@ -180,6 +207,7 @@ module.exports = {
     getAll,
     getById,
     getByUserDocument,
+    getByUserActive,
     create,
     update,
     deletePersonalInformation
