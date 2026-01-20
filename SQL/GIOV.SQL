@@ -32,6 +32,7 @@ CREATE TABLE categories(
     minAge INT(10) NOT NULL,
     maxAge INT(10) NOT NULL,
     description VARCHAR(100),
+    year DATE NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE athletes(
