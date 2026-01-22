@@ -10,18 +10,22 @@ const getById = async(id_categorie)=>{
     return result.rows[0]
 }
 
-const getByYear = async(year)=>{
-    const result = await pool.query('SELECT * FROM categories WHERE year = $1',[year])
+const getByYear = async(parsedYear)=>{
+    const year = Number.parseInt(parsedYear, 10)
+    if (Number.isNaN(year)) {
+        return []
+    }
+    const result = await pool.query('SELECT * FROM categories WHERE EXTRACT(YEAR FROM year) = $1',[year])
     return result.rows
 }
 
-const create = async(name,minAge,maxAge,description,year) =>{
-    const result = await pool.query('INSERT INTO categoreies (name,minAge,maxAge,description,year) VALUES ($1,$2,$3,$4,$5) RETURNING *',[name,minAge,maxAge,description,year])
+const create = async(name,minAge,maxAge,description,yearAsDate) =>{
+    const result = await pool.query('INSERT INTO categories (name,minAge,maxAge,description,year) VALUES ($1,$2,$3,$4,$5) RETURNING *',[name,minAge,maxAge,description,yearAsDate])
     return result.rows[0]
 }
 
-const update = async(name,minAge,maxAge,description,year,id_categorie) =>{
-    const result = await pool.query('UPDATE categories SET name = $1, minAge = $2, maxAge = $3, description = $4, year = $5 WHERE id_categorie = $6 RETURNING *',[name,minAge,maxAge,description,year,id_categorie])
+const update = async(name,minAge,maxAge,description,yearAsDate,id_categorie) =>{
+    const result = await pool.query('UPDATE categories SET name = $1, minAge = $2, maxAge = $3, description = $4, year = $5 WHERE id_categorie = $6 RETURNING *',[name,minAge,maxAge,description,yearAsDate,id_categorie])
     return result.rows[0]
 }
 

@@ -59,7 +59,15 @@ const getByYear = async(req,res)=>{
             })
         }
 
-        const categories = await categorieModel.getByYear(year)
+        const parsedYear = Number.parseInt(year, 10)
+        if(Number.isNaN(parsedYear)){
+            return res.status(400).json({
+                status:'Error',
+                mensaje:'El año no es válido'
+            })
+        }
+
+        const categories = await categorieModel.getByYear(parsedYear)
         if(categories.length === 0){
             return res.status(404).json({
                 status:'Error',
@@ -73,6 +81,7 @@ const getByYear = async(req,res)=>{
             categorias:categories
         })
     }catch(error){
+        console.log(error)
         return res.status(500).json({
             status:'Error',
             mensaje:'No es posible obtener la categoria'
@@ -90,7 +99,17 @@ const create = async(req,res)=>{
             })
         }
 
-        const categorie = await categorieModel.create(name,minAge,maxAge,description,year)
+        const parsedYear = Number.parseInt(year, 10)
+        if(Number.isNaN(parsedYear)){
+            return res.status(400).json({
+                status:'Error',
+                mensaje:'El año no es válido'
+            })
+        }
+
+        const yearAsDate = `${parsedYear}-01-01`
+
+        const categorie = await categorieModel.create(name,minAge,maxAge,description,yearAsDate)
         return res.status(200).json({
             status:'Success',
             mensaje:'Categoria creada con exito',
@@ -116,6 +135,16 @@ const update = async(req,res)=>{
             })
         }
 
+        const parsedYear = Number.parseInt(year, 10)
+        if(Number.isNaN(parsedYear)){
+            return res.status(400).json({
+                status:'Error',
+                mensaje:'El año no es válido'
+            })
+        }
+
+        const yearAsDate = `${parsedYear}-01-01`
+
         const existsCategorie = await categorieModel.getById(id_categorie)
         if(!existsCategorie){
             return res.status(404).json({
@@ -124,7 +153,7 @@ const update = async(req,res)=>{
             })
         }
 
-        const categorie = await categorieModel.update(name,minAge,maxAge,description,year,id_categorie)
+        const categorie = await categorieModel.update(name,minAge,maxAge,description,yearAsDate,id_categorie)
         return res.status(200).json({
             status:'Success',
             mensaje:'Categoria actualizada con exito',

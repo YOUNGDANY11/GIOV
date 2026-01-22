@@ -26,13 +26,13 @@ CREATE TABLE documents(
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE categories(
+CREATE TABLE categories (
     id_categorie SERIAL PRIMARY KEY,
     name VARCHAR(20) NOT NULL,
-    minAge INT(10) NOT NULL,
-    maxAge INT(10) NOT NULL,
+    minAge INT NOT NULL,
+    maxAge INT NOT NULL,
     description VARCHAR(100),
-    year DATE NOT NULL DEFAULT NOW()
+    year DATE NOT NULL DEFAULT CURRENT_DATE
 );
 
 CREATE TABLE athletes(
