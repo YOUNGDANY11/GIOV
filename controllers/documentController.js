@@ -176,7 +176,7 @@ const update = async (req, res) => {
                 const newAbs = path.join(__dirname, '..', 'uploads', 'documents', newFile.filename)
                 await safeUnlink(newAbs)
             } catch (_cleanupError) {
-                // ignore cleanup error
+                console.log(_cleanupError)
             }
         }
 
