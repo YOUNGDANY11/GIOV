@@ -12,9 +12,6 @@ const getById = async(id_categorie)=>{
 
 const getByYear = async(parsedYear)=>{
     const year = Number.parseInt(parsedYear, 10)
-    if (Number.isNaN(year)) {
-        return []
-    }
     const result = await pool.query('SELECT * FROM categories WHERE EXTRACT(YEAR FROM year) = $1',[year])
     return result.rows
 }

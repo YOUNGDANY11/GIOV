@@ -22,9 +22,6 @@ const getByUserDocument = async(document) =>{
 
 const getByDate = async(year)=>{
     const birthYear = Number.parseInt(year, 10)
-    if (Number.isNaN(birthYear)) {
-        return []
-    }
     const result = await pool.query(`SELECT  a.*, u.name AS name, u.lastname AS lastname, u.document AS user_document FROM athletes a INNER JOIN users u ON u.id_user = a.id_user WHERE EXTRACT(YEAR FROM a.date) = $1`,[birthYear])
     return result.rows
 }

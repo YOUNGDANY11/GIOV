@@ -85,11 +85,11 @@ CREATE TABLE relatives(
 
 CREATE TABLE competencies(
     id_competencie BIGSERIAL PRIMARY KEY,
-    categorie INT NOT NULL REFERENCES categories(id_categorie) ON DELETE CASCADE ON UPDATE CASCADE,
+    id_categorie INT NOT NULL REFERENCES categories(id_categorie) ON DELETE CASCADE ON UPDATE CASCADE,
     name VARCHAR(100) NOT NULL,
     description VARCHAR(100) NOT NULL,
     startDate DATE NOT NULL DEFAULT NOW(),
-    finisDate DATE,
+    finishDate DATE,
     status VARCHAR(10) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
