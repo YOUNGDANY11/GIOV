@@ -13,6 +13,8 @@ const personalInformationRoutes = require('./routes/personalInformationRoutes')
 const relativeRoutes = require('./routes/relativeRoutes')
 const categorieRoutes = require('./routes/categorieRoutes')
 const competencieRoutes = require('./routes/competencieRoutes')
+const athleteInCompetencieRoutes = require('./routes/athleteInCompetencieRoutes')
+
 
 const app = express()
 const PORT = process.env.PORT
@@ -32,7 +34,7 @@ app.use('/api/personalInf',personalInformationRoutes)
 app.use('/api/relatives', relativeRoutes)
 app.use('/api/categories', categorieRoutes)
 app.use('/api/competencies', competencieRoutes)
-
+app.use('/api/athletesInCompetencies', athleteInCompetencieRoutes)
 
 app.listen(PORT,() =>{
     console.log(`Server corriendo en el puerto ${PORT}`)
