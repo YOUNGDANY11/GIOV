@@ -2,6 +2,9 @@ const express = require('express')
 const cors = require('cors')
 require('dotenv').config()
 
+const swaggerUi = require('swagger-ui-express')
+const swaggerSpec = require('./swagger')
+
 //Importaciones
 const userRoutes = require('./routes/userRoutes')
 const authRoutes = require('./routes/authRoutes')
@@ -17,11 +20,21 @@ const athleteInCompetencieRoutes = require('./routes/athleteInCompetencieRoutes'
 
 
 const app = express()
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 3000
 
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
+
+// Swagger
+app.get('/api-docs.json', (_req, res) => {
+    res.json(swaggerSpec)
+})
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    swaggerOptions: {
+        persistAuthorization: true
+    }
+}))
 
 //Endpoints
 app.use('/api/users',userRoutes)
