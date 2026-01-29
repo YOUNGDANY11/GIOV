@@ -1,5 +1,6 @@
 const express = require('express')
 const cors = require('cors')
+const path = require('path')
 require('dotenv').config()
 
 const swaggerUi = require('swagger-ui-express')
@@ -25,6 +26,8 @@ const PORT = process.env.PORT || 3000
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 // Swagger
 app.get('/api-docs.json', (_req, res) => {

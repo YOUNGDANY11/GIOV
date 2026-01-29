@@ -16,6 +16,7 @@ router.put('/id/:id', auth, roleMiddleware(1,2,3,4,5,6,7), athleteController.upd
 
 //Deportistas
 router.post('/active', auth, roleMiddleware(8),athleteController.createByUserActive)
+router.get('/active', auth, roleMiddleware(8), athleteController.getByAthleteActive)
 router.put('/', auth, auth, roleMiddleware(8), athleteController.updateByAthlete)
 
 module.exports = router

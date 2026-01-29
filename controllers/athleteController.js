@@ -183,6 +183,29 @@ const getByFoot = async(req,res)=>{
     }   
 }
 
+const getByAthleteActive = async(req,res)=>{
+    try{
+        const {id} = req.user
+        const id_user = id
+        const athlete = await athleteModel.getByUserId(id_user)
+        if(!athlete){
+            return res.status(404).json({
+                status:'Error',
+                mensaje:'No existe este deportista'
+            })
+        }
+        return res.status(200).json({
+            status:'Success',
+            mensaje:'Consulta exitosa',
+            deportista:athlete
+        })
+    }catch(error){
+        return res.status(500).json({
+            status:'Error',
+            mensaje:'No se pudo obtener el deportista'
+        })
+    }
+}
 
 const createByUserActive = async(req,res)=>{
     try{
@@ -323,6 +346,7 @@ module.exports = {
     getByDate,
     getByStature,
     getByFoot,
+    getByAthleteActive,
     createByUserActive,
     update,
     updateByAthlete,

@@ -845,6 +845,17 @@ module.exports = {
     },
 
     '/api/athletes/active': {
+      get: {
+        tags: ['Athletes'],
+        summary: 'Obtener atleta del usuario autenticado (solo Deportista)',
+        description: `Acceso: ${roleLabel([8])}. Consulta por id_user del token.`,
+        security: bearerAuth,
+        responses: {
+          200: { description: 'Atleta', content: { 'application/json': { schema: { type: 'object', properties: { status: { type: 'string' }, mensaje: { type: 'string' }, deportista: { $ref: '#/components/schemas/Athlete' } } } } } },
+          404: { description: 'No existe atleta para el usuario', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      },
       post: {
         tags: ['Athletes'],
         summary: 'Crear atleta desde usuario autenticado (solo Deportista)',

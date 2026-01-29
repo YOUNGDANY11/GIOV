@@ -2,6 +2,14 @@ const documentModel = require('../models/documentModel')
 const fs = require('fs')
 const path = require('path')
 
+const isAdminRole = (role) => [1, 2, 3].includes(Number(role))
+
+const safeDownloadName = (value) => {
+    const raw = String(value ?? '').trim()
+    const normalized = raw.replace(/[^a-zA-Z0-9 _.-]/g, '_')
+    return normalized || 'documento'
+}
+
 const safeUnlink = async (absolutePath) => {
     try {
         await fs.promises.unlink(absolutePath)
@@ -229,11 +237,77 @@ const deleteDocument = async (req, res) => {
 }
 
 
+const downloadById = async (req, res) => {
+    try {
+        const { id } = req.params
+        const id_document = id
+
+        const existing = await documentModel.getById(id_document)
+        if (!existing) {
+            return res.status(404).json({
+                status: 'Error',
+                mensaje: 'No existe este documento'
+            })
+        }
+
+        const requesterId = req.user?.id
+        const requesterRole = req.user?.role
+
+        const isOwner = Number(existing.id_user) === Number(requesterId)
+        if (!isOwner && !isAdminRole(requesterRole)) {
+            return res.status(403).json({
+                status: 'Error',
+                mensaje: 'No autorizado para descargar este documento'
+            })
+        }
+
+        const storedPath = String(existing.document ?? '').replace(/\\/g, '/').trim()
+        if (!storedPath || !storedPath.startsWith('uploads/documents/')) {
+            return res.status(400).json({
+                status: 'Error',
+                mensaje: 'Ruta de documento inválida'
+            })
+        }
+
+        const uploadsDocumentsDir = path.resolve(__dirname, '..', 'uploads', 'documents')
+        const diskPath = path.resolve(__dirname, '..', storedPath)
+
+        if (!diskPath.startsWith(uploadsDocumentsDir + path.sep)) {
+            return res.status(400).json({
+                status: 'Error',
+                mensaje: 'Ruta de documento inválida'
+            })
+        }
+
+        try {
+            await fs.promises.access(diskPath, fs.constants.R_OK)
+        } catch (_err) {
+            return res.status(404).json({
+                status: 'Error',
+                mensaje: 'Archivo no encontrado en el servidor'
+            })
+        }
+
+        const ext = path.extname(diskPath)
+        const base = safeDownloadName(existing.name)
+        const filename = base.toLowerCase().endsWith(ext.toLowerCase()) ? base : `${base}${ext}`
+
+        return res.download(diskPath, filename)
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            status: 'Error',
+            mensaje: 'No se pudo descargar el documento'
+        })
+    }
+}
+
 module.exports = {
     getAll,
     getById,
     getByUserDocument,
     create,
     update,
-    deleteDocument
+    deleteDocument,
+    downloadById
 }

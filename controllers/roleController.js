@@ -64,6 +64,7 @@ const create = async(req,res)=>{
             rol: role
         })
     }catch(error){
+        console.log(error)
         return res.status(500).json({
             status:'Error',
             mensaje:'No se pudo crear el rol'

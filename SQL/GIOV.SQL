@@ -43,7 +43,7 @@ CREATE TABLE athletes(
     address VARCHAR(100) NOT NULL,
     blood_type VARCHAR(10) NOT NULL,
     stature VARCHAR(10) NOT NULL,
-    categorie INT NOT NULL REFERENCES categories(id_categorie) ON DELETE CASCADE ON UPDATE CASCADE,
+    categorie INT REFERENCES categories(id_categorie) ON DELETE CASCADE ON UPDATE CASCADE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
