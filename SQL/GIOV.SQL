@@ -80,6 +80,7 @@ CREATE TABLE relatives(
     deparment VARCHAR(50) NOT NULL,
     city VARCHAR(50) NOT NULL,
     type VARCHAR(50) NOT NULL,    
+    contact VARCHAR(10) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

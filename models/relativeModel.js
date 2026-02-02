@@ -35,13 +35,13 @@ const getByLastName = async(lastname)=>{
     return result.rows
 }
 
-const create = async(id_user,name,lastname,document,email,country,deparment,city, type) =>{
-    const result = await pool.query('INSERT INTO relatives (id_user,name,lastname,document,email,country,deparment,city,type) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *',[id_user,name,lastname,document,email,country,deparment,city,type])
+const create = async(id_user,name,lastname,document,email,country,deparment,city, type, contact) =>{
+    const result = await pool.query('INSERT INTO relatives (id_user,name,lastname,document,email,country,deparment,city,type,contact) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *',[id_user,name,lastname,document,email,country,deparment,city,type,contact])
     return result.rows[0]
 }
 
-const update = async(name,lastname,document,email,country,deparment,city,type,id_relative)=>{
-    const result = await pool.query('UPDATE relatives SET name = $1, lastname = $2, document = $3, email = $4, country = $5, deparment = $6, city = $7, type = $8 WHERE id_relative = $9 RETURNING *',[name,lastname,document,email,country,deparment,city,type,id_relative])
+const update = async(name,lastname,document,email,country,deparment,city,type,contact,id_relative)=>{
+    const result = await pool.query('UPDATE relatives SET name = $1, lastname = $2, document = $3, email = $4, country = $5, deparment = $6, city = $7, type = $8, contact = $9 WHERE id_relative = $10 RETURNING *',[name,lastname,document,email,country,deparment,city,type,contact,id_relative])
     return result.rows[0]
 }
 

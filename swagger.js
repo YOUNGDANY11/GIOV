@@ -190,6 +190,7 @@ module.exports = {
           deparment: { type: 'string' },
           city: { type: 'string' },
           type: { type: 'string', description: 'Tipo de parentesco' },
+          contact: { type: 'string', description: 'Contacto (teléfono u otro)' },
           created_at: { type: 'string', format: 'date-time' },
           athlete_name: { type: 'string', description: 'Nombre del atleta (join)' },
           athlete_lastname: { type: 'string', description: 'Apellido del atleta (join)' },
@@ -1204,9 +1205,10 @@ module.exports = {
                   country: { type: 'string' },
                   deparment: { type: 'string' },
                   city: { type: 'string' },
-                  type: { type: 'string' }
+                  type: { type: 'string' },
+                  contact: { type: 'string' }
                 },
-                required: ['id_user', 'name', 'lastname', 'document', 'email', 'country', 'deparment', 'city', 'type']
+                required: ['id_user', 'name', 'lastname', 'document', 'email', 'country', 'deparment', 'city', 'type', 'contact']
               }
             }
           }
@@ -1248,9 +1250,10 @@ module.exports = {
                   country: { type: 'string' },
                   deparment: { type: 'string' },
                   city: { type: 'string' },
-                  type: { type: 'string' }
+                  type: { type: 'string' },
+                  contact: { type: 'string' }
                 },
-                required: ['name', 'lastname', 'document', 'email', 'country', 'deparment', 'city', 'type']
+                required: ['name', 'lastname', 'document', 'email', 'country', 'deparment', 'city', 'type', 'contact']
               }
             }
           }
@@ -1354,9 +1357,10 @@ module.exports = {
                   country: { type: 'string' },
                   deparment: { type: 'string' },
                   city: { type: 'string' },
-                  type: { type: 'string' }
+                  type: { type: 'string' },
+                  contact: { type: 'string' }
                 },
-                required: ['name', 'lastname', 'document', 'email', 'country', 'deparment', 'city', 'type']
+                required: ['name', 'lastname', 'document', 'email', 'country', 'deparment', 'city', 'type', 'contact']
               }
             }
           }

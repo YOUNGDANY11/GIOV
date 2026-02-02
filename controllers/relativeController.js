@@ -201,15 +201,15 @@ const create = async(req,res)=>{
     try{
         const {id} = req.user
         const id_user = id
-        const {name,lastname,document,email,country,deparment,city, type} = req.body
-        if(!name || !lastname || !document || !email || !country || !deparment || !city || !type){
+        const {name,lastname,document,email,country,deparment,city, type, contact} = req.body
+        if(!name || !lastname || !document || !email || !country || !deparment || !city || !type || !contact){
             return res.status(400).json({
                 status:'Error',
                 mensaje:'Es requerida toda la informacio'
             })
         }
 
-        const relative = await relativeModel.create(id_user,name,lastname,document,email,country,deparment,city, type)
+        const relative = await relativeModel.create(id_user,name,lastname,document,email,country,deparment,city, type,contact)
         return res.status(200).json({
             status:'Success',
             mensaje:'Pariente creado con exito',
@@ -225,15 +225,15 @@ const create = async(req,res)=>{
 
 const createByAdmin = async(req,res)=>{
     try{
-        const {id_user,name,lastname,document,email,country,deparment,city, type} = req.body
-        if(!id_user || !name || !lastname || !document || !email || !country || !deparment || !city || !type){
+        const {id_user,name,lastname,document,email,country,deparment,city, type,contact} = req.body
+        if(!id_user || !name || !lastname || !document || !email || !country || !deparment || !city || !type || !contact){
             return res.status(400).json({
                 status:'Error',
                 mensaje:'Es requerida toda la informacio'
             })
         }
 
-        const relative = await relativeModel.create(id_user,name,lastname,document,email,country,deparment,city, type)
+        const relative = await relativeModel.create(id_user,name,lastname,document,email,country,deparment,city, type,contact)
         return res.status(200).json({
             status:'Success',
             mensaje:'Pariente creado con exito',
@@ -250,8 +250,8 @@ const update = async(req,res)=>{
     try{
         const {id} = req.params
         const id_relative = id
-        const {name,lastname,document,email,country,deparment,city, type} = req.body
-        if(!name || !lastname || !document || !email || !country || !deparment || !city || !type){
+        const {name,lastname,document,email,country,deparment,city, type,contact} = req.body
+        if(!name || !lastname || !document || !email || !country || !deparment || !city || !type || !contact){
             return res.status(400).json({
                 status:'Error',
                 mensaje:'Es requerida toda la informacio'
@@ -266,7 +266,7 @@ const update = async(req,res)=>{
             })
         }
 
-        const relative = await relativeModel.update(name,lastname,document,email,country,deparment,city, type,id_relative)
+        const relative = await relativeModel.update(name,lastname,document,email,country,deparment,city, type,contact,id_relative)
         return res.status(200).json({
             status:'Success',
             mensaje:'Actualizacion de informacion con exito',
