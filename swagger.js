@@ -49,7 +49,8 @@ module.exports = {
     { name: 'Relatives', description: `Admin/Cuerpo técnico: ${roleLabel([1, 2, 3, 4, 5, 6, 7])} | Atleta (self): autenticado` },
     { name: 'Categories', description: `Requiere roles: ${roleLabel([1, 2, 3, 4, 5, 6, 7])}` },
     { name: 'Competencies', description: `Requiere roles: ${roleLabel([1, 2, 3, 4, 5, 6, 7])}` },
-    { name: 'Athletes In Competencies', description: `Requiere roles: ${roleLabel([1, 2, 3, 4])}` }
+    { name: 'Athletes In Competencies', description: `Requiere roles: ${roleLabel([1, 2, 3, 4])}` },
+    { name: 'Trainings', description: `Requiere roles: ${roleLabel([1, 2, 3, 4])} (GET /api/trainings también permite ${roleLabel([8])})` }
   ],
   components: {
     securitySchemes: {
@@ -258,6 +259,52 @@ module.exports = {
           categorie_description: { type: 'string', nullable: true },
           categorie_year: { type: 'string', format: 'date' }
         }
+      },
+      TrainingView: {
+        type: 'object',
+        description: 'Respuesta de consultas (GET) de entrenamientos: no incluye created_at/updated_at y agrega info relacionada.',
+        properties: {
+          id_training: { type: 'integer', format: 'int64' },
+          id_categorie: { type: 'integer' },
+          id_staff: { type: 'integer', format: 'int64' },
+          name: { type: 'string' },
+          description: { type: 'string' },
+          date: { type: 'string', format: 'date' },
+          time: { type: 'string', description: 'TIME (HH:MM:SS)' },
+          location: { type: 'string' },
+          staff_name: { type: 'string' },
+          staff_lastname: { type: 'string' },
+          categorie_name: { type: 'string' }
+        }
+      },
+      TrainingRecord: {
+        type: 'object',
+        description: 'Registro directo de la tabla trainings (RETURNING *): incluye created_at/updated_at.',
+        properties: {
+          id_training: { type: 'integer', format: 'int64' },
+          id_categorie: { type: 'integer' },
+          id_staff: { type: 'integer', format: 'int64' },
+          name: { type: 'string' },
+          description: { type: 'string' },
+          date: { type: 'string', format: 'date' },
+          time: { type: 'string', description: 'TIME (HH:MM:SS)' },
+          location: { type: 'string' },
+          created_at: { type: 'string', format: 'date-time' },
+          updated_at: { type: 'string', format: 'date-time' }
+        }
+      },
+      TrainingUpsert: {
+        type: 'object',
+        properties: {
+          id_categorie: { type: 'integer' },
+          id_staff: { type: 'integer', format: 'int64' },
+          name: { type: 'string' },
+          description: { type: 'string' },
+          date: { type: 'string', format: 'date' },
+          time: { type: 'string', description: 'TIME (HH:MM:SS)' },
+          location: { type: 'string' }
+        },
+        required: ['id_categorie', 'id_staff', 'name', 'description', 'date', 'time', 'location']
       }
     }
   },
@@ -1602,6 +1649,209 @@ module.exports = {
         responses: {
           200: { description: 'Competencias', content: { 'application/json': { schema: { type: 'object', properties: { competencias: { type: 'array', items: { $ref: '#/components/schemas/Competency' } } } } } } },
           403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/trainings': {
+      get: {
+        tags: ['Trainings'],
+        summary: 'Listar entrenamientos',
+        description: `Acceso: ${roleLabel([1, 2, 3, 4])} (también ${roleLabel([8])})`,
+        security: bearerAuth,
+        responses: {
+          200: {
+            description: 'Lista de entrenamientos',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string' },
+                    mensaje: { type: 'string' },
+                    entrenamientos: { type: 'array', items: { $ref: '#/components/schemas/TrainingView' } }
+                  }
+                }
+              }
+            }
+          },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No hay entrenamientos', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      },
+      post: {
+        tags: ['Trainings'],
+        summary: 'Crear entrenamiento',
+        security: bearerAuth,
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { $ref: '#/components/schemas/TrainingUpsert' } } }
+        },
+        responses: {
+          200: {
+            description: 'Entrenamiento creado',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string' },
+                    mensaje: { type: 'string' },
+                    entrenamiento: { $ref: '#/components/schemas/TrainingRecord' }
+                  }
+                }
+              }
+            }
+          },
+          400: { description: 'Validación / duplicado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/trainings/id/{id}': {
+      get: {
+        tags: ['Trainings'],
+        summary: 'Obtener entrenamiento por id_training',
+        security: bearerAuth,
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: {
+          200: {
+            description: 'Entrenamiento',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string' },
+                    mensaje: { type: 'string' },
+                    entrenamiento: { $ref: '#/components/schemas/TrainingView' }
+                  }
+                }
+              }
+            }
+          },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No existe', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      },
+      put: {
+        tags: ['Trainings'],
+        summary: 'Actualizar entrenamiento por id_training',
+        security: bearerAuth,
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/TrainingUpsert' } } } },
+        responses: {
+          200: {
+            description: 'Actualizado',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string' },
+                    mensaje: { type: 'string' },
+                    entrenamiento: { $ref: '#/components/schemas/TrainingRecord' }
+                  }
+                }
+              }
+            }
+          },
+          400: { description: 'Validación / duplicado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No existe', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      },
+      delete: {
+        tags: ['Trainings'],
+        summary: 'Eliminar entrenamiento por id_training',
+        security: bearerAuth,
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: {
+          200: {
+            description: 'Eliminado',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string' },
+                    mensaje: { type: 'string' },
+                    entrenamiento: { $ref: '#/components/schemas/TrainingRecord' }
+                  }
+                }
+              }
+            }
+          },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No existe', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/trainings/staff/{id}': {
+      get: {
+        tags: ['Trainings'],
+        summary: 'Listar entrenamientos por id_staff',
+        security: bearerAuth,
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: {
+          200: {
+            description: 'Entrenamientos',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string' },
+                    mensaje: { type: 'string' },
+                    entrenamientos: { type: 'array', items: { $ref: '#/components/schemas/TrainingView' } }
+                  }
+                }
+              }
+            }
+          },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No hay entrenamientos', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/trainings/location': {
+      get: {
+        tags: ['Trainings'],
+        summary: 'Listar entrenamientos por ubicación (body.location)',
+        security: bearerAuth,
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { type: 'object', properties: { location: { type: 'string' } }, required: ['location'] } } }
+        },
+        responses: {
+          200: {
+            description: 'Entrenamientos',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string' },
+                    mensaje: { type: 'string' },
+                    entrenamientos: { type: 'array', items: { $ref: '#/components/schemas/TrainingView' } }
+                  }
+                }
+              }
+            }
+          },
+          400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No hay entrenamientos', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
         }
       }
     },
