@@ -104,6 +104,60 @@ CREATE TABLE athletes_in_competencies(
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE staff_in_competencies(
+    id_staff_comp BIGSERIAL PRIMARY KEY,
+    id_staff BIGINT NOT NULL REFERENCES staff(id_staff) ON DELETE CASCADE ON UPDATE CASCADE,
+    id_competencie BIGINT NOT NULL REFERENCES competencies(id_competencie) ON DELETE CASCADE ON UPDATE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE trainings(
+    id_training BIGSERIAL PRIMARY KEY,
+    id_categorie INT NOT NULL REFERENCES categories(id_categorie) ON DELETE CASCADE ON UPDATE CASCADE,
+    id_staff BIGINT NOT NULL REFERENCES staff(id_staff) ON DELETE CASCADE ON UPDATE CASCADE,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(100) NOT NULL,
+    date DATE NOT NULL,
+    time TIME NOT NULL,
+    location VARCHAR(100) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE attendances(
+    id_attendance BIGSERIAL PRIMARY KEY,
+    id_athlete BIGINT NOT NULL REFERENCES athletes(id_athlete) ON DELETE CASCADE ON UPDATE CASCADE,
+    id_training BIGINT NOT NULL REFERENCES trainings(id_training) ON DELETE CASCADE ON UPDATE CASCADE,
+    status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE injuries(
+    id_injury BIGSERIAL PRIMARY KEY,
+    id_athlete BIGINT NOT NULL REFERENCES athletes(id_athlete) ON DELETE CASCADE ON UPDATE CASCADE,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    date DATE NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE treatments(
+    id_treatment BIGSERIAL PRIMARY KEY,
+    id_injury BIGINT NOT NULL REFERENCES injuries(id_injury) ON DELETE CASCADE ON UPDATE CASCADE,
+    id_staff BIGINT NOT NULL REFERENCES staff(id_staff) ON DELETE CASCADE ON UPDATE CASCADE,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    startDate DATE NOT NULL,
+    endDate DATE,
+    status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 
 -- INSERCIONES --
 INSERT INTO roles (id_role, name, code) VALUES 
