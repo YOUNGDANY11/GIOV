@@ -50,6 +50,7 @@ module.exports = {
     { name: 'Categories', description: `Requiere roles: ${roleLabel([1, 2, 3, 4, 5, 6, 7])}` },
     { name: 'Competencies', description: `Requiere roles: ${roleLabel([1, 2, 3, 4, 5, 6, 7])}` },
     { name: 'Athletes In Competencies', description: `Requiere roles: ${roleLabel([1, 2, 3, 4])}` },
+    { name: 'Staff In Competencies', description: `Requiere roles: ${roleLabel([1, 2, 3, 4])}` },
     { name: 'Trainings', description: `Requiere roles: ${roleLabel([1, 2, 3, 4])} (GET /api/trainings también permite ${roleLabel([8])})` }
   ],
   components: {
@@ -244,6 +245,37 @@ module.exports = {
           user_id: { type: 'integer', format: 'int64' },
           athlete_id: { type: 'integer', format: 'int64' },
           athlete_date: { type: 'string', format: 'date' },
+          user_document: { type: 'string' },
+          user_name: { type: 'string' },
+          user_lastname: { type: 'string' },
+          competencie_id: { type: 'integer', format: 'int64' },
+          competencie_categorie: { type: 'integer' },
+          competencie_name: { type: 'string' },
+          competencie_description: { type: 'string' },
+          competencie_status: { type: 'string' },
+          categorie_id: { type: 'integer' },
+          categorie_name: { type: 'string' },
+          categorie_minage: { type: 'integer' },
+          categorie_maxage: { type: 'integer' },
+          categorie_description: { type: 'string', nullable: true },
+          categorie_year: { type: 'string', format: 'date' }
+        }
+      },
+      StaffInCompetency: {
+        type: 'object',
+        properties: {
+          id_staff_comp: { type: 'integer', format: 'int64' },
+          id_staff: { type: 'integer', format: 'int64' },
+          id_competencie: { type: 'integer', format: 'int64' },
+          created_at: { type: 'string', format: 'date-time' },
+          updated_at: { type: 'string', format: 'date-time' },
+          user_id: { type: 'integer', format: 'int64' },
+          staff_id: { type: 'integer', format: 'int64' },
+          staff_date: { type: 'string', format: 'date' },
+          staff_address: { type: 'string' },
+          staff_blood_type: { type: 'string' },
+          staff_information: { type: 'string' },
+          staff_description: { type: 'string' },
           user_document: { type: 'string' },
           user_name: { type: 'string' },
           user_lastname: { type: 'string' },
@@ -751,6 +783,25 @@ module.exports = {
       }
     },
 
+    '/api/documents/id/{id}/download': {
+      get: {
+        tags: ['Documents - Self'],
+        summary: 'Descargar documento por id_document (owner o admin/superiores)',
+        description: `Permite descargar si es dueño (id_user del token) o si el rol es ${roleLabel([1, 2, 3])}.`,
+        security: bearerAuth,
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: {
+          200: {
+            description: 'Archivo (download)'
+          },
+          400: { description: 'Ruta inválida', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No existe / archivo no encontrado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
     '/api/documents/document': {
       get: {
         tags: ['Documents - Admin'],
@@ -781,6 +832,32 @@ module.exports = {
           200: { description: 'Atletas', content: { 'application/json': { schema: { type: 'object', properties: { status: { type: 'string' }, mensaje: { type: 'string' }, deportistas: { type: 'array', items: { $ref: '#/components/schemas/Athlete' } } } } } } },
           403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
           404: { description: 'No hay', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      },
+      put: {
+        tags: ['Athletes'],
+        summary: 'Actualizar atleta del usuario autenticado (solo Deportista)',
+        description: `Acceso: ${roleLabel([8])}. Actualiza por id_user del token.`,
+        security: bearerAuth,
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  address: { type: 'string' },
+                  stature: { type: 'string' },
+                  foot: { type: 'string' }
+                },
+                required: ['address', 'stature', 'foot']
+              }
+            }
+          }
+        },
+        responses: {
+          200: { description: 'Actualizado', content: { 'application/json': { schema: { type: 'object', properties: { status: { type: 'string' }, mensaje: { type: 'string' }, deportista: { $ref: '#/components/schemas/Athlete' } } } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
         }
       }
     },
@@ -935,40 +1012,11 @@ module.exports = {
       }
     },
 
-    '/api/athletes/': {
-      put: {
-        tags: ['Athletes'],
-        summary: 'Actualizar atleta del usuario autenticado (solo Deportista)',
-        description: `Acceso: ${roleLabel([8])}. Actualiza por id_user del token.`,
-        security: bearerAuth,
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  address: { type: 'string' },
-                  stature: { type: 'string' },
-                  foot: { type: 'string' }
-                },
-                required: ['address', 'stature', 'foot']
-              }
-            }
-          }
-        },
-        responses: {
-          200: { description: 'Actualizado', content: { 'application/json': { schema: { type: 'object', properties: { status: { type: 'string' }, mensaje: { type: 'string' }, deportista: { $ref: '#/components/schemas/Athlete' } } } } } },
-          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
-        }
-      }
-    },
-
     '/api/staff': {
       get: {
         tags: ['Staff'],
         summary: 'Listar staff (admin/superiores)',
-        description: `Acceso: ${roleLabel([1, 2, 3])}`,
+        description: `Acceso: ${roleLabel([1, 2, 3, 4, 5, 6, 7])}`,
         security: bearerAuth,
         responses: {
           200: { description: 'Staff', content: { 'application/json': { schema: { type: 'object', properties: { status: { type: 'string' }, mensaje: { type: 'string' }, staff: { type: 'array', items: { $ref: '#/components/schemas/Staff' } } } } } } },
@@ -981,6 +1029,7 @@ module.exports = {
       get: {
         tags: ['Staff'],
         summary: 'Obtener staff por id_staff (admin/superiores)',
+        description: `Acceso: ${roleLabel([1, 2, 3, 4, 5, 6, 7])}`,
         security: bearerAuth,
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
         responses: {
@@ -991,6 +1040,7 @@ module.exports = {
       put: {
         tags: ['Staff'],
         summary: 'Actualizar staff por id_staff (admin/superiores)',
+        description: `Acceso: ${roleLabel([1, 2, 3])}.`,
         security: bearerAuth,
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
         requestBody: {
@@ -1019,6 +1069,7 @@ module.exports = {
       delete: {
         tags: ['Staff'],
         summary: 'Eliminar staff por id_staff (admin/superiores)',
+        description: `Acceso: ${roleLabel([1, 2, 3])}.`,
         security: bearerAuth,
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
         responses: {
@@ -1928,6 +1979,145 @@ module.exports = {
         responses: {
           200: { description: 'Registros', content: { 'application/json': { schema: { type: 'object', properties: { atleta: { type: 'array', items: { $ref: '#/components/schemas/AthleteInCompetency' } } } } } } },
           403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/athletesInCompetencies/name': {
+      get: {
+        tags: ['Athletes In Competencies'],
+        summary: 'Listar asignaciones por nombre del atleta (body.name)',
+        security: bearerAuth,
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] } } } },
+        responses: {
+          200: { description: 'Registros', content: { 'application/json': { schema: { type: 'object', properties: { atleta: { type: 'array', items: { $ref: '#/components/schemas/AthleteInCompetency' } } } } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/athletesInCompetencies/lastname': {
+      get: {
+        tags: ['Athletes In Competencies'],
+        summary: 'Listar asignaciones por apellido del atleta (body.lastname)',
+        security: bearerAuth,
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { lastname: { type: 'string' } }, required: ['lastname'] } } } },
+        responses: {
+          200: { description: 'Registros', content: { 'application/json': { schema: { type: 'object', properties: { atleta: { type: 'array', items: { $ref: '#/components/schemas/AthleteInCompetency' } } } } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/staffInCompetencies': {
+      get: {
+        tags: ['Staff In Competencies'],
+        summary: 'Listar staff en competencias',
+        security: bearerAuth,
+        responses: {
+          200: { description: 'Registros', content: { 'application/json': { schema: { type: 'object', properties: { staff: { type: 'array', items: { $ref: '#/components/schemas/StaffInCompetency' } } } } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      },
+      post: {
+        tags: ['Staff In Competencies'],
+        summary: 'Asignar staff a competencia',
+        security: bearerAuth,
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { type: 'object', properties: { id_staff: { type: 'integer' }, id_competencie: { type: 'integer' } }, required: ['id_staff', 'id_competencie'] } } }
+        },
+        responses: {
+          200: { description: 'Asignado', content: { 'application/json': { schema: { type: 'object' } } } },
+          400: { description: 'Ya asociado / validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Staff o competencia no existe', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/staffInCompetencies/id/{id}': {
+      get: {
+        tags: ['Staff In Competencies'],
+        summary: 'Obtener asignación por id_staff_comp',
+        security: bearerAuth,
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: {
+          200: { description: 'Registro', content: { 'application/json': { schema: { type: 'object', properties: { staff: { $ref: '#/components/schemas/StaffInCompetency' } } } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No existe', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      },
+      put: {
+        tags: ['Staff In Competencies'],
+        summary: 'Actualizar asignación por id_staff_comp',
+        security: bearerAuth,
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { type: 'object', properties: { id_staff: { type: 'integer' }, id_competencie: { type: 'integer' } }, required: ['id_staff', 'id_competencie'] } } }
+        },
+        responses: {
+          200: { description: 'Actualizado', content: { 'application/json': { schema: { type: 'object' } } } },
+          400: { description: 'Ya asociado / validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No existe / referencias inválidas', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      },
+      delete: {
+        tags: ['Staff In Competencies'],
+        summary: 'Eliminar asignación por id_staff_comp',
+        security: bearerAuth,
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: {
+          200: { description: 'Eliminado', content: { 'application/json': { schema: { type: 'object' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No existe', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/staffInCompetencies/document': {
+      get: {
+        tags: ['Staff In Competencies'],
+        summary: 'Listar asignaciones por documento del staff (body.document)',
+        security: bearerAuth,
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { document: { type: 'string' } }, required: ['document'] } } } },
+        responses: {
+          200: { description: 'Registros', content: { 'application/json': { schema: { type: 'object', properties: { staff: { type: 'array', items: { $ref: '#/components/schemas/StaffInCompetency' } } } } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/staffInCompetencies/name': {
+      get: {
+        tags: ['Staff In Competencies'],
+        summary: 'Listar asignaciones por nombre del staff (body.name)',
+        security: bearerAuth,
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] } } } },
+        responses: {
+          200: { description: 'Registros', content: { 'application/json': { schema: { type: 'object', properties: { staff: { type: 'array', items: { $ref: '#/components/schemas/StaffInCompetency' } } } } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/staffInCompetencies/lastname': {
+      get: {
+        tags: ['Staff In Competencies'],
+        summary: 'Listar asignaciones por apellido del staff (body.lastname)',
+        security: bearerAuth,
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { lastname: { type: 'string' } }, required: ['lastname'] } } } },
+        responses: {
+          200: { description: 'Registros', content: { 'application/json': { schema: { type: 'object', properties: { staff: { type: 'array', items: { $ref: '#/components/schemas/StaffInCompetency' } } } } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
         }
       }
     }

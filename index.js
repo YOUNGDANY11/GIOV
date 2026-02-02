@@ -19,7 +19,7 @@ const categorieRoutes = require('./routes/categorieRoutes')
 const competencieRoutes = require('./routes/competencieRoutes')
 const athleteInCompetencieRoutes = require('./routes/athleteInCompetencieRoutes')
 const trainingRoutes = require('./routes/trainingRoutes')
-
+const staffInCompetecieRoutes = require('./routes/staffInCompetencieRoute')
 
 
 const app = express()
@@ -54,7 +54,7 @@ app.use('/api/categories', categorieRoutes)
 app.use('/api/competencies', competencieRoutes)
 app.use('/api/athletesInCompetencies', athleteInCompetencieRoutes)
 app.use('/api/trainings', trainingRoutes)
-
+app.use('/api/staffInCompetencies', staffInCompetecieRoutes)
 
 app.listen(PORT,() =>{
     console.log(`Server corriendo en el puerto ${PORT}`)

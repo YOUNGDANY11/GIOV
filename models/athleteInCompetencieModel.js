@@ -47,6 +47,17 @@ const getAthleteInCompetencieActive = async(id_athlete, id_competencie) =>{
     return result.rows
 }
 
+const getByNameAthlete = async(name)=>{
+    const result = await pool.query(`${baseSelect} WHERE u.name ILIKE $1 ORDER BY aic.created_at DESC`, [`%${name}%`])
+    return result.rows
+}
+
+const getByLastNameAthlete = async(lastname)=>{
+    const result = await pool.query(`${baseSelect} WHERE u.lastname ILIKE $1 ORDER BY aic.created_at DESC`, [`%${lastname}%`])
+    return result.rows
+}
+
+
 const create = async(id_athlete, id_competencie) =>{
     const result = await pool.query('INSERT INTO athletes_in_competencies (id_athlete,id_competencie) VALUES ($1,$2) RETURNING *',[id_athlete, id_competencie])
     return result.rows[0]
@@ -67,6 +78,8 @@ module.exports = {
     getById,
     getByDocumentAthlete,
     getAthleteInCompetencieActive,
+    getByNameAthlete,
+    getByLastNameAthlete,
     create,
     update,
     deleteAthlInComp

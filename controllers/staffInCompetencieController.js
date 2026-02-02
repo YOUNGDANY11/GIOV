@@ -1,26 +1,26 @@
-const athInCompModel = require('../models/athleteInCompetencieModel')
-const athleteModel = require('../models/athleteModel')
+const staffInCompModel = require('../models/staffInCompetencieModel')
+const staffModel = require('../models/staffModel')
 const competencieModel = require('../models/competencieModel')
 
 const getAll = async(req,res)=>{
     try{
-        const athInComp = await athInCompModel.getAll()
-        if(athInComp.length === 0){
+        const staffInComp = await staffInCompModel.getAll()
+        if(staffInComp.length === 0){
             return res.status(404).json({
                 status:'Error',
-                mensaje:'No hay atletas registrados en competencia'
+                mensaje:'No hay staff registrados en competencia'
             })
         }
         return res.status(200).json({
             status:'Success',
             mensaje:'Consulta exitosa',
-            atletas:athInComp
+            staff:staffInComp
         })
     }catch(error){
         console.log(error)
         return res.status(500).json({
             status:'Error',
-            mensaje:'No es posible obtener los atletas en competencia'
+            mensaje:'No es posible obtener el staff en competencia'
         })
     }
 }
@@ -28,9 +28,9 @@ const getAll = async(req,res)=>{
 const getById = async(req,res)=>{
     try{
         const {id} = req.params
-        const id_ath_comp = id
-        const athInComp = await athInCompModel.getById(id_ath_comp)
-        if(!athInComp){
+        const id_staff_comp = id
+        const staffInComp = await staffInCompModel.getById(id_staff_comp)
+        if(!staffInComp){
             return res.status(404).json({
                 status:'Error',
                 mensaje:'No existe este registro'
@@ -40,17 +40,17 @@ const getById = async(req,res)=>{
         return res.status(200).json({
             status:'Success',
             mensaje:'Consulta exitosa',
-            atleta:athInComp
+            staff:staffInComp
         })
     }catch(error){
         return res.status(500).json({
             status:'Error',
-            mensaje:'No es posible obtener el atleta en competencia'
+            mensaje:'No es posible obtener el staff en competencia'
         })
     }
 }
 
-const getByDocumentAthlete = async(req,res)=>{
+const getByDocumentStaff = async(req,res)=>{
     try{
         const {document} = req.body
 
@@ -61,29 +61,29 @@ const getByDocumentAthlete = async(req,res)=>{
             })
         }
 
-        const athInComp = await athInCompModel.getByDocumentAthlete(document)
-        if(athInComp.length === 0){
+        const staffInComp = await staffInCompModel.getByDocumentStaff(document)
+        if(staffInComp.length === 0){
             return res.status(404).json({
                 status:'Error',
-                mensaje:'No existe registro de competencia de este deportista'
+                mensaje:'No existe registro de competencia de este staff'
             })
         }
 
         return res.status(200).json({
             status:'Success',
             mensaje:'Consulta exitosa',
-            atleta:athInComp
+            staff:staffInComp
         })
     }catch(error){
         console.log(error)
         return res.status(500).json({
             status:'Error',
-            mensaje:'No es posible obtener el atleta en competencia'
+            mensaje:'No es posible obtener el staff en competencia'
         })
     }
 }
 
-const getByNameAthlete = async(req,res)=>{
+const getByNameStaff = async(req,res)=>{
     try{
         const {name} = req.body
         if(!name){
@@ -92,28 +92,28 @@ const getByNameAthlete = async(req,res)=>{
                 mensaje:'Es requerido el nombre del deportista'
             })
         }
-        const athleteInComp = await athInCompModel.getByNameAthlete(name)
-        if(athleteInComp.length === 0){
+        const staffInComp = await staffInCompModel.getByNameStaff(name)
+        if(staffInComp.length === 0){
             return res.status(404).json({
                 status:'Error',
-                mensaje:'Este deportista no esta en competencia'
+                mensaje:'Este staff no esta en competencia'
             })
         }
 
         return res.status(200).json({
             status:'Success',
             mensaje:'Consulta exitosa',
-            atleta:athleteInComp
+            staff:staffInComp
         })
     }catch(error){
         return res.status(500).json({
             status:'Error',
-            mensaje:'No es posible obtener el/o atletas en competencia'
+            mensaje:'No es posible obtener el/o staff en competencia'
         })
     }
 }
 
-const getByLastNameAthlete = async(req,res)=>{
+const getByLastNameStaff = async(req,res)=>{
     try{
         const {lastname} = req.body
         if(!lastname){
@@ -122,42 +122,42 @@ const getByLastNameAthlete = async(req,res)=>{
                 mensaje:'Es requerido el nombre del deportista'
             })
         }
-        const athleteInComp = await athInCompModel.getByLastNameAthlete(lastname)
-        if(athleteInComp.length === 0){
+        const staffInComp = await staffInCompModel.getByLastNameStaff(lastname)
+        if(staffInComp.length === 0){
             return res.status(404).json({
                 status:'Error',
-                mensaje:'Este deportista no esta en competencia'
+                mensaje:'Este staff no esta en competencia'
             })
         }
 
         return res.status(200).json({
             status:'Success',
             mensaje:'Consulta exitosa',
-            atleta:athleteInComp
+            staff:staffInComp
         })
     }catch(error){
         return res.status(500).json({
             status:'Error',
-            mensaje:'No es posible obtener el/o atletas en competencia'
+            mensaje:'No es posible obtener el/o staff en competencia'
         })
     }
 }
 
 const create =  async(req,res)=>{
     try{
-        const {id_athlete,id_competencie} = req.body
-        if(!id_athlete || !id_competencie){
+        const {id_staff,id_competencie} = req.body
+        if(!id_staff || !id_competencie){
             return res.status(400).json({
                 status:'Error',
                 mensaje:'Es requerida toda la informacion'
             })
         }
 
-        const existsAthlete = await athleteModel.getById(id_athlete)
-        if(!existsAthlete){
+        const existsStaff = await staffModel.getById(id_staff)
+        if(!existsStaff){
             return res.status(404).json({
                 status:'Error',
-                mensaje:'No existe este deportista'
+                mensaje:'No existe este staff'
             })
         }
 
@@ -165,28 +165,29 @@ const create =  async(req,res)=>{
         if(!existsCompetencie){
             return res.status(404).json({
                 status:'Error',
-                mensaje:'No existe este deportista'
+                mensaje:'No existe esta competencia'
             })
         }
 
-        const validAthInComp = await athInCompModel.getAthleteInCompetencieActive(id_athlete,id_competencie)
-        if(validAthInComp.length >= 1){
+        const validStaffInComp = await staffInCompModel.getStaffInCompetencieActive(id_staff,id_competencie)
+        if(validStaffInComp.length >= 1){
             return res.status(400).json({
                 status:'Error',
-                mensaje:'Este deportista ya esta asociado a la competencia'
+                mensaje:'Este staff ya esta asociado a la competencia'
             })
         }
 
-        const athInComp = await athInCompModel.create(id_athlete,id_competencie)
+        const staffInComp = await staffInCompModel.create(id_staff,id_competencie)
         return res.status(200).json({
             status:'Success',
             mensaje:'Asignacion de competencia ha sido exitosa',
-            athInComp
+            staffInComp
         })
     }catch(error){
+        console.log(error)
         return res.status(500).json({
             status:'Error',
-            mensaje:'No es posible crear el atleta en competencia'
+            mensaje:'No es posible crear el staff en competencia'
         })
     }
 }
@@ -194,20 +195,20 @@ const create =  async(req,res)=>{
 const update  = async(req,res)=>{
     try{    
         const {id} = req.params
-        const id_ath_comp = id
-        const {id_athlete,id_competencie} = req.body
-        if(!id_athlete || !id_competencie){
+        const id_staff_comp = id
+        const {id_staff,id_competencie} = req.body
+        if(!id_staff || !id_competencie){
             return res.status(400).json({
                 status:'Error',
                 mensaje:'Es requerida toda la informacion'
             })
         }
 
-        const existsAthlete = await athleteModel.getById(id_athlete)
-        if(!existsAthlete){
+        const existsStaff = await staffModel.getById(id_staff)
+        if(!existsStaff){
             return res.status(404).json({
                 status:'Error',
-                mensaje:'No existe este deportista'
+                mensaje:'No existe este staff'
             })
         }
 
@@ -215,56 +216,56 @@ const update  = async(req,res)=>{
         if(!existsCompetencie){
             return res.status(404).json({
                 status:'Error',
-                mensaje:'No existe este deportista'
+                mensaje:'No existe esta competencia'
             })
         }
 
-        const validAthInComp = await athInCompModel.getAthleteInCompetencieActive(id_athlete,id_competencie)
-        if(validAthInComp.length >= 1){
+        const validStaffInComp = await staffInCompModel.getStaffInCompetencieActive(id_staff,id_competencie)
+        if(validStaffInComp.length >= 1){
             return res.status(400).json({
                 status:'Error',
-                mensaje:'Este deportista ya esta asociado a la competencia'
+                mensaje:'Este staff ya esta asociado a la competencia'
             })
         }
 
-        const athInComp = await athInCompModel.update(id_athlete,id_competencie,id_ath_comp)
+        const staffInComp = await staffInCompModel.update(id_staff,id_competencie,id_staff_comp)
         return res.status(200).json({
             status:'Success',
             mensaje:'Actualizado con exito',
-            atleta:athInComp
+            staffInComp
         })
 
     }catch(error){
         return res.status(500).json({
             status:'Error',
-            mensaje:'No es posible actualizar el atleta en competencia'
+            mensaje:'No es posible actualizar el staff en competencia'
         })
     }
 }
 
-const deleteAthlInComp = async(req,res)=>{
+const deleteStaffInComp = async(req,res)=>{
     try{
         const {id} = req.params
-        const id_ath_comp = id
+        const id_staff_comp = id
 
-        const existsAthInCom = await athInCompModel.getById(id_ath_comp)
-        if(!existsAthInCom){
+        const existsStaffInCom = await staffInCompModel.getById(id_staff_comp)
+        if(!existsStaffInCom){
             return res.status(404).json({
                 status:'Error',
                 mensaje:'No existe este registro'
             })
         }
 
-        const athInComp = await athInCompModel.deleteAthlInComp(id_ath_comp)
+        const staffInComp = await staffInCompModel.deleteStaffInComp(id_staff_comp)
         return res.status(200).json({
             status:'Success',
-            mensaje:'El deportista ha sido eliminado de esta competencia de forma exitosa',
-            atleta:athInComp
+            mensaje:'El staff ha sido eliminado de esta competencia de forma exitosa',
+            staffInComp
         })
     }catch(error){
         return res.status(500).json({
             status:'Error',
-            mensaje:'No es posible eliminar el atleta en competencia'
+            mensaje:'No es posible eliminar el staff en competencia'
         })
     }
 }
@@ -272,10 +273,10 @@ const deleteAthlInComp = async(req,res)=>{
 module.exports = {
     getAll,
     getById,
-    getByDocumentAthlete,
-    getByNameAthlete,
-    getByLastNameAthlete,
+    getByDocumentStaff,
+    getByNameStaff,
+    getByLastNameStaff,
     create,
     update,
-    deleteAthlInComp
+    deleteStaffInComp
 }
