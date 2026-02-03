@@ -51,7 +51,10 @@ module.exports = {
     { name: 'Competencies', description: `Requiere roles: ${roleLabel([1, 2, 3, 4, 5, 6, 7])}` },
     { name: 'Athletes In Competencies', description: `Requiere roles: ${roleLabel([1, 2, 3, 4])}` },
     { name: 'Staff In Competencies', description: `Requiere roles: ${roleLabel([1, 2, 3, 4])}` },
-    { name: 'Trainings', description: `Requiere roles: ${roleLabel([1, 2, 3, 4])} (GET /api/trainings también permite ${roleLabel([8])})` }
+    { name: 'Trainings', description: `Requiere roles: ${roleLabel([1, 2, 3, 4])} (GET /api/trainings también permite ${roleLabel([8])})` },
+    { name: 'Attendances', description: `Admin/Cuerpo técnico: ${roleLabel([1, 2, 3, 4])} | Deportista (self): ${roleLabel([8])}` },
+    { name: 'Injuries', description: `Consulta: ${roleLabel([1, 2, 3, 4, 5, 6, 7])} | Deportista (self): ${roleLabel([8])} | Gestión: ${roleLabel([5, 6, 7])}` },
+    { name: 'Treatments', description: `Consulta: ${roleLabel([1, 2, 3, 4, 5, 6, 7])} | Deportista (self): ${roleLabel([8])} | Staff (self): /api/treatments/staff/active` }
   ],
   components: {
     securitySchemes: {
@@ -337,6 +340,122 @@ module.exports = {
           location: { type: 'string' }
         },
         required: ['id_categorie', 'id_staff', 'name', 'description', 'date', 'time', 'location']
+      },
+      AttendanceView: {
+        type: 'object',
+        description: 'Respuesta de consultas (GET) de asistencias: incluye info del atleta y del entrenamiento (joins).',
+        properties: {
+          id_attendance: { type: 'integer', format: 'int64' },
+          id_athlete: { type: 'integer', format: 'int64' },
+          id_training: { type: 'integer', format: 'int64' },
+          status: { type: 'string', example: 'Verificado' },
+          created_at: { type: 'string', format: 'date-time' },
+          updated_at: { type: 'string', format: 'date-time' },
+          athlete_name: { type: 'string' },
+          athlete_lastname: { type: 'string' },
+          training_name: { type: 'string' },
+          training_date: { type: 'string', format: 'date' },
+          training_time: { type: 'string', description: 'TIME (HH:MM:SS)' },
+          training_location: { type: 'string' }
+        }
+      },
+      AttendanceRecord: {
+        type: 'object',
+        description: 'Registro directo de la tabla attendances (RETURNING *).',
+        properties: {
+          id_attendance: { type: 'integer', format: 'int64' },
+          id_athlete: { type: 'integer', format: 'int64' },
+          id_training: { type: 'integer', format: 'int64' },
+          status: { type: 'string' },
+          created_at: { type: 'string', format: 'date-time' },
+          updated_at: { type: 'string', format: 'date-time' }
+        }
+      },
+      InjuryView: {
+        type: 'object',
+        description: 'Respuesta de consultas (GET) de lesiones: incluye info del atleta (join a users/athletes) + campos de injuries.',
+        properties: {
+          user_id: { type: 'integer', format: 'int64' },
+          athlete_id: { type: 'integer', format: 'int64' },
+          athlete_date: { type: 'string', format: 'date' },
+          user_document: { type: 'string' },
+          user_name: { type: 'string' },
+          user_lastname: { type: 'string' },
+          id_injury: { type: 'integer', format: 'int64' },
+          id_athlete: { type: 'integer', format: 'int64' },
+          name: { type: 'string' },
+          description: { type: 'string' },
+          date: { type: 'string', format: 'date' },
+          status: { type: 'string' },
+          created_at: { type: 'string', format: 'date-time' },
+          updated_at: { type: 'string', format: 'date-time' }
+        }
+      },
+      InjuryRecord: {
+        type: 'object',
+        description: 'Registro directo de la tabla injuries (RETURNING *).',
+        properties: {
+          id_injury: { type: 'integer', format: 'int64' },
+          id_athlete: { type: 'integer', format: 'int64' },
+          name: { type: 'string' },
+          description: { type: 'string' },
+          date: { type: 'string', format: 'date' },
+          status: { type: 'string' },
+          created_at: { type: 'string', format: 'date-time' },
+          updated_at: { type: 'string', format: 'date-time' }
+        }
+      },
+      TreatmentView: {
+        type: 'object',
+        description: 'Respuesta de consultas (GET) de tratamientos: incluye info del staff, atleta y lesión (joins) + campos de treatments.',
+        properties: {
+          staff_user_id: { type: 'integer', format: 'int64' },
+          staff_id: { type: 'integer', format: 'int64' },
+          staff_document: { type: 'string' },
+          staff_name: { type: 'string' },
+          staff_lastname: { type: 'string' },
+          athlete_user_id: { type: 'integer', format: 'int64' },
+          athlete_id: { type: 'integer', format: 'int64' },
+          athlete_date: { type: 'string', format: 'date' },
+          athlete_document: { type: 'string' },
+          athlete_name: { type: 'string' },
+          athlete_lastname: { type: 'string' },
+          injury_id: { type: 'integer', format: 'int64' },
+          injury_name: { type: 'string' },
+          injury_description: { type: 'string' },
+          injury_date: { type: 'string', format: 'date' },
+          injury_status: { type: 'string' },
+          id_treatment: { type: 'integer', format: 'int64' },
+          id_injury: { type: 'integer', format: 'int64' },
+          id_staff: { type: 'integer', format: 'int64' },
+          name: { type: 'string' },
+          description: { type: 'string' },
+          startdate: { type: 'string', format: 'date', description: 'Puede salir como startdate dependiendo del driver/case' },
+          enddate: { type: 'string', format: 'date', nullable: true, description: 'Puede salir como enddate dependiendo del driver/case' },
+          startDate: { type: 'string', format: 'date' },
+          endDate: { type: 'string', format: 'date', nullable: true },
+          status: { type: 'string' },
+          created_at: { type: 'string', format: 'date-time' },
+          updated_at: { type: 'string', format: 'date-time' }
+        }
+      },
+      TreatmentRecord: {
+        type: 'object',
+        description: 'Registro directo de la tabla treatments (RETURNING *).',
+        properties: {
+          id_treatment: { type: 'integer', format: 'int64' },
+          id_injury: { type: 'integer', format: 'int64' },
+          id_staff: { type: 'integer', format: 'int64' },
+          name: { type: 'string' },
+          description: { type: 'string' },
+          startdate: { type: 'string', format: 'date', description: 'Nombre real en DB (Postgres normaliza a minúsculas)' },
+          enddate: { type: 'string', format: 'date', nullable: true, description: 'Nombre real en DB (Postgres normaliza a minúsculas)' },
+          startDate: { type: 'string', format: 'date' },
+          endDate: { type: 'string', format: 'date', nullable: true },
+          status: { type: 'string' },
+          created_at: { type: 'string', format: 'date-time' },
+          updated_at: { type: 'string', format: 'date-time' }
+        }
       }
     }
   },
@@ -2118,6 +2237,600 @@ module.exports = {
           200: { description: 'Registros', content: { 'application/json': { schema: { type: 'object', properties: { staff: { type: 'array', items: { $ref: '#/components/schemas/StaffInCompetency' } } } } } } },
           403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
           404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/attendances': {
+      get: {
+        tags: ['Attendances'],
+        summary: 'Listar asistencias',
+        description: `Acceso: ${roleLabel([1, 2, 3, 4])}`,
+        security: bearerAuth,
+        responses: {
+          200: {
+            description: 'Lista de asistencias',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string' },
+                    mensaje: { type: 'string' },
+                    asistencias: { type: 'array', items: { $ref: '#/components/schemas/AttendanceView' } }
+                  }
+                }
+              }
+            }
+          },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No hay asistencias', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      },
+      post: {
+        tags: ['Attendances'],
+        summary: 'Crear asistencia (deportista)',
+        description: `Acceso: ${roleLabel([8])}`,
+        security: bearerAuth,
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  id_athlete: { type: 'integer', format: 'int64' },
+                  id_training: { type: 'integer', format: 'int64' },
+                  status: { type: 'string', example: 'Pendiente' }
+                },
+                required: ['id_athlete', 'id_training', 'status']
+              }
+            }
+          }
+        },
+        responses: {
+          200: {
+            description: 'Asistencia creada',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string' },
+                    mensaje: { type: 'string' },
+                    asistencia: { $ref: '#/components/schemas/AttendanceRecord' }
+                  }
+                }
+              }
+            }
+          },
+          400: { description: 'Validación / ya registrada', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/attendances/id/{id}': {
+      get: {
+        tags: ['Attendances'],
+        summary: 'Obtener asistencia por id_attendance',
+        security: bearerAuth,
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: {
+          200: {
+            description: 'Asistencia',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string' },
+                    mensaje: { type: 'string' },
+                    asistencias: { $ref: '#/components/schemas/AttendanceView' }
+                  }
+                }
+              }
+            }
+          },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No existe', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      },
+      delete: {
+        tags: ['Attendances'],
+        summary: 'Eliminar asistencia por id_attendance',
+        security: bearerAuth,
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: {
+          200: {
+            description: 'Eliminada',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string' },
+                    mensaje: { type: 'string' },
+                    asistencia: { $ref: '#/components/schemas/AttendanceRecord' }
+                  }
+                }
+              }
+            }
+          },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No existe', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/attendances/training/{id}': {
+      get: {
+        tags: ['Attendances'],
+        summary: 'Listar asistencias por id_training',
+        security: bearerAuth,
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: {
+          200: { description: 'Asistencias', content: { 'application/json': { schema: { type: 'object', properties: { asistencias: { type: 'array', items: { $ref: '#/components/schemas/AttendanceView' } } } } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/attendances/athlete/name': {
+      get: {
+        tags: ['Attendances'],
+        summary: 'Listar asistencias por nombre del atleta (body.name)',
+        security: bearerAuth,
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] } } } },
+        responses: {
+          200: { description: 'Asistencias', content: { 'application/json': { schema: { type: 'object', properties: { asistencias: { type: 'array', items: { $ref: '#/components/schemas/AttendanceView' } } } } } } },
+          400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/attendances/athlete/lastname': {
+      get: {
+        tags: ['Attendances'],
+        summary: 'Listar asistencias por apellido del atleta (body.lastname)',
+        security: bearerAuth,
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { lastname: { type: 'string' } }, required: ['lastname'] } } } },
+        responses: {
+          200: { description: 'Asistencias', content: { 'application/json': { schema: { type: 'object', properties: { asistencias: { type: 'array', items: { $ref: '#/components/schemas/AttendanceView' } } } } } } },
+          400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/attendances/status': {
+      get: {
+        tags: ['Attendances'],
+        summary: 'Listar asistencias por estado (body.status)',
+        security: bearerAuth,
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { status: { type: 'string' } }, required: ['status'] } } } },
+        responses: {
+          200: { description: 'Asistencias', content: { 'application/json': { schema: { type: 'object', properties: { asistencias: { type: 'array', items: { $ref: '#/components/schemas/AttendanceView' } } } } } } },
+          400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/attendances/athlete/active': {
+      get: {
+        tags: ['Attendances'],
+        summary: 'Listar asistencias activas del deportista autenticado',
+        description: `Acceso: ${roleLabel([8])}`,
+        security: bearerAuth,
+        responses: {
+          200: { description: 'Asistencias', content: { 'application/json': { schema: { type: 'object', properties: { asistencias: { type: 'array', items: { $ref: '#/components/schemas/AttendanceView' } } } } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros / atleta no existe', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/injuries': {
+      get: {
+        tags: ['Injuries'],
+        summary: 'Listar lesiones',
+        description: `Acceso: ${roleLabel([1, 2, 3, 4, 5, 6, 7])}`,
+        security: bearerAuth,
+        responses: {
+          200: { description: 'Lesiones', content: { 'application/json': { schema: { type: 'object', properties: { lesiones: { type: 'array', items: { $ref: '#/components/schemas/InjuryView' } } } } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      },
+      post: {
+        tags: ['Injuries'],
+        summary: 'Crear lesión',
+        description: `Acceso: ${roleLabel([5, 6, 7])}`,
+        security: bearerAuth,
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  id_athlete: { type: 'integer', format: 'int64' },
+                  name: { type: 'string' },
+                  description: { type: 'string' },
+                  date: { type: 'string', format: 'date' },
+                  status: { type: 'string', example: 'Activa' }
+                },
+                required: ['id_athlete', 'name', 'description', 'date', 'status']
+              }
+            }
+          }
+        },
+        responses: {
+          200: { description: 'Lesión creada', content: { 'application/json': { schema: { type: 'object', properties: { lesion: { $ref: '#/components/schemas/InjuryRecord' } } } } } },
+          400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Atleta no existe', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/injuries/id/{id}': {
+      get: {
+        tags: ['Injuries'],
+        summary: 'Obtener lesión por id_injury',
+        security: bearerAuth,
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: {
+          200: { description: 'Lesión', content: { 'application/json': { schema: { type: 'object', properties: { lesion: { $ref: '#/components/schemas/InjuryView' } } } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No existe', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      },
+      put: {
+        tags: ['Injuries'],
+        summary: 'Actualizar estado de lesión por id_injury',
+        description: `Acceso: ${roleLabel([5, 6, 7])}`,
+        security: bearerAuth,
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: { status: { type: 'string' } },
+                required: ['status']
+              }
+            }
+          }
+        },
+        responses: {
+          200: { description: 'Actualizada', content: { 'application/json': { schema: { type: 'object', properties: { lesion: { $ref: '#/components/schemas/InjuryRecord' } } } } } },
+          400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No existe', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      },
+      delete: {
+        tags: ['Injuries'],
+        summary: 'Eliminar lesión por id_injury',
+        description: `Acceso: ${roleLabel([5, 6, 7])}`,
+        security: bearerAuth,
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: {
+          200: { description: 'Eliminada', content: { 'application/json': { schema: { type: 'object', properties: { lesion: { $ref: '#/components/schemas/InjuryRecord' } } } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No existe', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/injuries/athlete/document': {
+      get: {
+        tags: ['Injuries'],
+        summary: 'Listar lesiones por documento del atleta (body.document)',
+        security: bearerAuth,
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { document: { type: 'string' } }, required: ['document'] } } } },
+        responses: {
+          200: { description: 'Lesiones', content: { 'application/json': { schema: { type: 'object', properties: { lesiones: { type: 'array', items: { $ref: '#/components/schemas/InjuryView' } } } } } } },
+          400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/injuries/athlete/name': {
+      get: {
+        tags: ['Injuries'],
+        summary: 'Listar lesiones por nombre del atleta (body.name)',
+        security: bearerAuth,
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] } } } },
+        responses: {
+          200: { description: 'Lesiones', content: { 'application/json': { schema: { type: 'object', properties: { lesiones: { type: 'array', items: { $ref: '#/components/schemas/InjuryView' } } } } } } },
+          400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/injuries/athlete/lastname': {
+      get: {
+        tags: ['Injuries'],
+        summary: 'Listar lesiones por apellido del atleta (body.lastname)',
+        security: bearerAuth,
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { lastname: { type: 'string' } }, required: ['lastname'] } } } },
+        responses: {
+          200: { description: 'Lesiones', content: { 'application/json': { schema: { type: 'object', properties: { lesiones: { type: 'array', items: { $ref: '#/components/schemas/InjuryView' } } } } } } },
+          400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/injuries/athlete/active': {
+      get: {
+        tags: ['Injuries'],
+        summary: 'Listar lesiones del deportista autenticado',
+        description: `Acceso: ${roleLabel([8])}`,
+        security: bearerAuth,
+        responses: {
+          200: { description: 'Lesiones', content: { 'application/json': { schema: { type: 'object', properties: { lesiones: { type: 'array', items: { $ref: '#/components/schemas/InjuryView' } } } } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/treatments': {
+      get: {
+        tags: ['Treatments'],
+        summary: 'Listar tratamientos',
+        description: `Acceso: ${roleLabel([1, 2, 3, 4, 5, 6, 7])}`,
+        security: bearerAuth,
+        responses: {
+          200: { description: 'Tratamientos', content: { 'application/json': { schema: { type: 'object', properties: { tratamientos: { type: 'array', items: { $ref: '#/components/schemas/TreatmentView' } } } } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      },
+      post: {
+        tags: ['Treatments'],
+        summary: 'Crear tratamiento',
+        description: 'Requiere usuario que sea staff (validación adicional en controller).',
+        security: bearerAuth,
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  id_injury: { type: 'integer', format: 'int64' },
+                  name: { type: 'string' },
+                  description: { type: 'string' },
+                  startDate: { type: 'string', format: 'date' },
+                  endDate: { type: 'string', format: 'date', nullable: true },
+                  status: { type: 'string', example: 'Activo' }
+                },
+                required: ['id_injury', 'name', 'description', 'startDate', 'status']
+              }
+            }
+          }
+        },
+        responses: {
+          201: { description: 'Tratamiento creado', content: { 'application/json': { schema: { type: 'object', properties: { tratamiento: { $ref: '#/components/schemas/TreatmentRecord' } } } } } },
+          400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'No eres staff / acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/treatments/id/{id}': {
+      get: {
+        tags: ['Treatments'],
+        summary: 'Obtener tratamiento por id_treatment',
+        security: bearerAuth,
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: {
+          200: { description: 'Tratamiento', content: { 'application/json': { schema: { type: 'object', properties: { tratamiento: { $ref: '#/components/schemas/TreatmentView' } } } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No existe', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      },
+      put: {
+        tags: ['Treatments'],
+        summary: 'Actualizar tratamiento por id_treatment',
+        security: bearerAuth,
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  endDate: { type: 'string', format: 'date' },
+                  status: { type: 'string' }
+                },
+                required: ['endDate', 'status']
+              }
+            }
+          }
+        },
+        responses: {
+          200: { description: 'Actualizado', content: { 'application/json': { schema: { type: 'object', properties: { tratamiento: { $ref: '#/components/schemas/TreatmentRecord' } } } } } },
+          400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No existe', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      },
+      delete: {
+        tags: ['Treatments'],
+        summary: 'Eliminar tratamiento por id_treatment',
+        security: bearerAuth,
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: {
+          200: { description: 'Eliminado', content: { 'application/json': { schema: { type: 'object', properties: { tratamiento: { $ref: '#/components/schemas/TreatmentRecord' } } } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No existe', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/treatments/staff/document': {
+      get: {
+        tags: ['Treatments'],
+        summary: 'Listar tratamientos por documento del staff (body.document)',
+        security: bearerAuth,
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { document: { type: 'string' } }, required: ['document'] } } } },
+        responses: {
+          200: { description: 'Tratamientos', content: { 'application/json': { schema: { type: 'object', properties: { tratamientos: { type: 'array', items: { $ref: '#/components/schemas/TreatmentView' } } } } } } },
+          400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/treatments/staff/name': {
+      get: {
+        tags: ['Treatments'],
+        summary: 'Listar tratamientos por nombre del staff (body.name)',
+        security: bearerAuth,
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] } } } },
+        responses: {
+          200: { description: 'Tratamientos', content: { 'application/json': { schema: { type: 'object', properties: { tratamientos: { type: 'array', items: { $ref: '#/components/schemas/TreatmentView' } } } } } } },
+          400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/treatments/staff/lastname': {
+      get: {
+        tags: ['Treatments'],
+        summary: 'Listar tratamientos por apellido del staff (body.lastname)',
+        security: bearerAuth,
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { lastname: { type: 'string' } }, required: ['lastname'] } } } },
+        responses: {
+          200: { description: 'Tratamientos', content: { 'application/json': { schema: { type: 'object', properties: { tratamientos: { type: 'array', items: { $ref: '#/components/schemas/TreatmentView' } } } } } } },
+          400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/treatments/athlete/document': {
+      get: {
+        tags: ['Treatments'],
+        summary: 'Listar tratamientos por documento del atleta (body.document)',
+        security: bearerAuth,
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { document: { type: 'string' } }, required: ['document'] } } } },
+        responses: {
+          200: { description: 'Tratamientos', content: { 'application/json': { schema: { type: 'object', properties: { tratamientos: { type: 'array', items: { $ref: '#/components/schemas/TreatmentView' } } } } } } },
+          400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/treatments/athlete/name': {
+      get: {
+        tags: ['Treatments'],
+        summary: 'Listar tratamientos por nombre del atleta (body.name)',
+        security: bearerAuth,
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] } } } },
+        responses: {
+          200: { description: 'Tratamientos', content: { 'application/json': { schema: { type: 'object', properties: { tratamientos: { type: 'array', items: { $ref: '#/components/schemas/TreatmentView' } } } } } } },
+          400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/treatments/athlete/lastname': {
+      get: {
+        tags: ['Treatments'],
+        summary: 'Listar tratamientos por apellido del atleta (body.lastname)',
+        security: bearerAuth,
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { lastname: { type: 'string' } }, required: ['lastname'] } } } },
+        responses: {
+          200: { description: 'Tratamientos', content: { 'application/json': { schema: { type: 'object', properties: { tratamientos: { type: 'array', items: { $ref: '#/components/schemas/TreatmentView' } } } } } } },
+          400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/treatments/staff/active': {
+      get: {
+        tags: ['Treatments'],
+        summary: 'Listar tratamientos del staff autenticado',
+        description: 'Devuelve 403 si el usuario autenticado no es staff.',
+        security: bearerAuth,
+        responses: {
+          200: { description: 'Tratamientos', content: { 'application/json': { schema: { type: 'object', properties: { tratamientos: { type: 'array', items: { $ref: '#/components/schemas/TreatmentView' } } } } } } },
+          403: { description: 'No eres staff / acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
+    '/api/treatments/athlete/active': {
+      get: {
+        tags: ['Treatments'],
+        summary: 'Listar tratamientos del deportista autenticado',
+        description: `Acceso: ${roleLabel([8])}`,
+        security: bearerAuth,
+        responses: {
+          200: { description: 'Tratamientos', content: { 'application/json': { schema: { type: 'object', properties: { tratamientos: { type: 'array', items: { $ref: '#/components/schemas/TreatmentView' } } } } } } },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'Sin registros', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
         }
       }
     }
