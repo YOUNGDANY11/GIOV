@@ -21,6 +21,8 @@ const athleteInCompetencieRoutes = require('./routes/athleteInCompetencieRoutes'
 const trainingRoutes = require('./routes/trainingRoutes')
 const staffInCompetecieRoutes = require('./routes/staffInCompetencieRoute')
 const attendanceRoutes = require('./routes/attendanceRoutes')
+const injurieRoutes = require('./routes/injurieRoutes') 
+
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -56,6 +58,7 @@ app.use('/api/athletesInCompetencies', athleteInCompetencieRoutes)
 app.use('/api/trainings', trainingRoutes)
 app.use('/api/staffInCompetencies', staffInCompetecieRoutes)
 app.use('/api/attendances', attendanceRoutes)
+app.use('/api/injuries', injurieRoutes)
 
 
 app.listen(PORT,() =>{
