@@ -14,10 +14,12 @@ router.get('/staff/lastname', auth, roleMiddleware(1,2,3,4,5,6,7), treatmentCont
 router.get('/athlete/document', auth, roleMiddleware(1,2,3,4,5,6,7), treatmentController.getByDocumentAthlete)
 router.get('/athlete/name', auth, roleMiddleware(1,2,3,4,5,6,7), treatmentController.getByNameAthlete)
 router.get('/athlete/lastname', auth, roleMiddleware(1,2,3,4,5,6,7), treatmentController.getByLastNameAthlete)
-router.post('/', auth, roleMiddleware(1,2,3,4,5,6,7), treatmentController.create)
-router.put('/id/:id', auth, roleMiddleware(1,2,3,4,5,6,7), treatmentController.update)
-router.delete('/id/:id', auth, roleMiddleware(1,2,3,4,5,6,7), treatmentController.deleteTreatment)
-router.get('/staff/active', auth, roleMiddleware(1,2,3,4,5,6,7), treatmentController.getByStaffActive)
+
+//Nivel medico, fisio, quiro
+router.post('/', auth, roleMiddleware(5,6,7), treatmentController.create)
+router.put('/id/:id', auth, roleMiddleware(5,6,7), treatmentController.update)
+router.delete('/id/:id', auth, roleMiddleware(5,6,7), treatmentController.deleteTreatment)
+router.get('/staff/active', auth, roleMiddleware(5,6,7), treatmentController.getByStaffActive)
 
 //Deportista
 router.get('/athlete/active', auth, roleMiddleware(8), treatmentController.getByAthletActive)

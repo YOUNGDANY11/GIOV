@@ -181,3 +181,7 @@ INSERT INTO categories (name, minAge, maxAge, description) VALUES
 ('U-20', 18, 20, 'Paso previo al fútbol profesional o universitario'),
 ('U-23', 21, 23, 'Consolidación deportiva y alto rendimiento'),
 ('Senior', 14, 99, 'Categoría de adultos y fútbol profesional');
+
+-- Usuario Admin (password: admin1234)
+INSERT INTO users (name, lastname, document, password, id_role) VALUES
+('Admin', 'Principal', '0000000001', '$2b$10$fsZnM.0v2n9aabASFfiGT.tXE8eFq5FQ.ReobvI3ZjO59OmGPglMO', 1);

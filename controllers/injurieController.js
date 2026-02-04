@@ -51,7 +51,7 @@ const getById = async(req,res)=>{
 
 const getByDocumentAthlete = async(req,res)=>{
     try{
-        const {document} = req.body
+        const document = (req.query?.document ?? req.body?.document)
         if(!document){
             return res.status(400).json({
                 status:'Error',
@@ -81,7 +81,7 @@ const getByDocumentAthlete = async(req,res)=>{
 
 const getByNameAthlete = async(req,res)=>{
     try{
-        const {name} = req.body
+        const name = (req.query?.name ?? req.body?.name)
         if(!name){
             return res.status(400).json({
                 status:'Error',
@@ -111,7 +111,7 @@ const getByNameAthlete = async(req,res)=>{
 
 const getByLastNameAthlete = async(req,res)=>{
     try{
-        const {lastname} = req.body
+        const lastname = (req.query?.lastname ?? req.body?.lastname)
         if(!lastname){
             return res.status(400).json({
                 status:'Error',
@@ -142,8 +142,15 @@ const getByLastNameAthlete = async(req,res)=>{
 const getByAthleteActive = async(req,res)=>{
     try{
         const {id} = req.user
-        const id_athlete = id
-        const injuries = await injurieModel.getByIdAthlete(id_athlete)
+        const id_user = id
+        const athlete = await athleteModel.getByUserId(id_user)
+        if(!athlete){
+            return res.status(404).json({
+                status:'Error',
+                mensajes:'No existe este deportista'
+            })
+        }
+        const injuries = await injurieModel.getByIdAthlete(athlete.id_athlete)
         if(injuries.length === 0){
             return res.status(404).json({
                 status:'Error',

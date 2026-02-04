@@ -1027,13 +1027,10 @@ module.exports = {
     '/api/athletes/document': {
       get: {
         tags: ['Athletes'],
-        summary: 'Buscar atleta por documento de usuario (body)',
-        description: 'GET leyendo `document` desde body.',
+        summary: 'Buscar atleta por documento de usuario (query.document)',
+        description: 'GET leyendo `document` desde query (con fallback a body).',
         security: bearerAuth,
-        requestBody: {
-          required: true,
-          content: { 'application/json': { schema: { type: 'object', properties: { document: { type: 'string' } }, required: ['document'] } } }
-        },
+        parameters: [{ name: 'document', in: 'query', required: true, schema: { type: 'string' } }],
         responses: {
           200: { description: 'Atleta', content: { 'application/json': { schema: { type: 'object', properties: { status: { type: 'string' }, mensaje: { type: 'string' }, atleta: { $ref: '#/components/schemas/Athlete' } } } } } },
           400: { description: 'Falta document', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
@@ -1993,6 +1990,35 @@ module.exports = {
       }
     },
 
+    '/api/trainings/staff/active': {
+      get: {
+        tags: ['Trainings'],
+        summary: 'Listar entrenamientos del staff autenticado',
+        description: `Acceso: ${roleLabel([1, 2, 3, 4])}. Resuelve id_staff a partir del id_user del token.`,
+        security: bearerAuth,
+        responses: {
+          200: {
+            description: 'Entrenamientos',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string' },
+                    mensaje: { type: 'string' },
+                    entrenamientos: { type: 'array', items: { $ref: '#/components/schemas/TrainingView' } }
+                  }
+                }
+              }
+            }
+          },
+          403: { description: 'Acceso denegado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          404: { description: 'No es staff o no hay entrenamientos', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          500: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      }
+    },
+
     '/api/trainings/location': {
       get: {
         tags: ['Trainings'],
@@ -2548,9 +2574,9 @@ module.exports = {
     '/api/injuries/athlete/document': {
       get: {
         tags: ['Injuries'],
-        summary: 'Listar lesiones por documento del atleta (body.document)',
+        summary: 'Listar lesiones por documento del atleta (query.document)',
         security: bearerAuth,
-        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { document: { type: 'string' } }, required: ['document'] } } } },
+        parameters: [{ name: 'document', in: 'query', required: true, schema: { type: 'string' } }],
         responses: {
           200: { description: 'Lesiones', content: { 'application/json': { schema: { type: 'object', properties: { lesiones: { type: 'array', items: { $ref: '#/components/schemas/InjuryView' } } } } } } },
           400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
@@ -2564,9 +2590,9 @@ module.exports = {
     '/api/injuries/athlete/name': {
       get: {
         tags: ['Injuries'],
-        summary: 'Listar lesiones por nombre del atleta (body.name)',
+        summary: 'Listar lesiones por nombre del atleta (query.name)',
         security: bearerAuth,
-        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] } } } },
+        parameters: [{ name: 'name', in: 'query', required: true, schema: { type: 'string' } }],
         responses: {
           200: { description: 'Lesiones', content: { 'application/json': { schema: { type: 'object', properties: { lesiones: { type: 'array', items: { $ref: '#/components/schemas/InjuryView' } } } } } } },
           400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
@@ -2580,9 +2606,9 @@ module.exports = {
     '/api/injuries/athlete/lastname': {
       get: {
         tags: ['Injuries'],
-        summary: 'Listar lesiones por apellido del atleta (body.lastname)',
+        summary: 'Listar lesiones por apellido del atleta (query.lastname)',
         security: bearerAuth,
-        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { lastname: { type: 'string' } }, required: ['lastname'] } } } },
+        parameters: [{ name: 'lastname', in: 'query', required: true, schema: { type: 'string' } }],
         responses: {
           200: { description: 'Lesiones', content: { 'application/json': { schema: { type: 'object', properties: { lesiones: { type: 'array', items: { $ref: '#/components/schemas/InjuryView' } } } } } } },
           400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
@@ -2712,9 +2738,9 @@ module.exports = {
     '/api/treatments/staff/document': {
       get: {
         tags: ['Treatments'],
-        summary: 'Listar tratamientos por documento del staff (body.document)',
+        summary: 'Listar tratamientos por documento del staff (query.document)',
         security: bearerAuth,
-        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { document: { type: 'string' } }, required: ['document'] } } } },
+        parameters: [{ name: 'document', in: 'query', required: true, schema: { type: 'string' } }],
         responses: {
           200: { description: 'Tratamientos', content: { 'application/json': { schema: { type: 'object', properties: { tratamientos: { type: 'array', items: { $ref: '#/components/schemas/TreatmentView' } } } } } } },
           400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
@@ -2728,9 +2754,9 @@ module.exports = {
     '/api/treatments/staff/name': {
       get: {
         tags: ['Treatments'],
-        summary: 'Listar tratamientos por nombre del staff (body.name)',
+        summary: 'Listar tratamientos por nombre del staff (query.name)',
         security: bearerAuth,
-        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] } } } },
+        parameters: [{ name: 'name', in: 'query', required: true, schema: { type: 'string' } }],
         responses: {
           200: { description: 'Tratamientos', content: { 'application/json': { schema: { type: 'object', properties: { tratamientos: { type: 'array', items: { $ref: '#/components/schemas/TreatmentView' } } } } } } },
           400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
@@ -2744,9 +2770,9 @@ module.exports = {
     '/api/treatments/staff/lastname': {
       get: {
         tags: ['Treatments'],
-        summary: 'Listar tratamientos por apellido del staff (body.lastname)',
+        summary: 'Listar tratamientos por apellido del staff (query.lastname)',
         security: bearerAuth,
-        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { lastname: { type: 'string' } }, required: ['lastname'] } } } },
+        parameters: [{ name: 'lastname', in: 'query', required: true, schema: { type: 'string' } }],
         responses: {
           200: { description: 'Tratamientos', content: { 'application/json': { schema: { type: 'object', properties: { tratamientos: { type: 'array', items: { $ref: '#/components/schemas/TreatmentView' } } } } } } },
           400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
@@ -2760,9 +2786,9 @@ module.exports = {
     '/api/treatments/athlete/document': {
       get: {
         tags: ['Treatments'],
-        summary: 'Listar tratamientos por documento del atleta (body.document)',
+        summary: 'Listar tratamientos por documento del atleta (query.document)',
         security: bearerAuth,
-        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { document: { type: 'string' } }, required: ['document'] } } } },
+        parameters: [{ name: 'document', in: 'query', required: true, schema: { type: 'string' } }],
         responses: {
           200: { description: 'Tratamientos', content: { 'application/json': { schema: { type: 'object', properties: { tratamientos: { type: 'array', items: { $ref: '#/components/schemas/TreatmentView' } } } } } } },
           400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
@@ -2776,9 +2802,9 @@ module.exports = {
     '/api/treatments/athlete/name': {
       get: {
         tags: ['Treatments'],
-        summary: 'Listar tratamientos por nombre del atleta (body.name)',
+        summary: 'Listar tratamientos por nombre del atleta (query.name)',
         security: bearerAuth,
-        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] } } } },
+        parameters: [{ name: 'name', in: 'query', required: true, schema: { type: 'string' } }],
         responses: {
           200: { description: 'Tratamientos', content: { 'application/json': { schema: { type: 'object', properties: { tratamientos: { type: 'array', items: { $ref: '#/components/schemas/TreatmentView' } } } } } } },
           400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
@@ -2792,9 +2818,9 @@ module.exports = {
     '/api/treatments/athlete/lastname': {
       get: {
         tags: ['Treatments'],
-        summary: 'Listar tratamientos por apellido del atleta (body.lastname)',
+        summary: 'Listar tratamientos por apellido del atleta (query.lastname)',
         security: bearerAuth,
-        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { lastname: { type: 'string' } }, required: ['lastname'] } } } },
+        parameters: [{ name: 'lastname', in: 'query', required: true, schema: { type: 'string' } }],
         responses: {
           200: { description: 'Tratamientos', content: { 'application/json': { schema: { type: 'object', properties: { tratamientos: { type: 'array', items: { $ref: '#/components/schemas/TreatmentView' } } } } } } },
           400: { description: 'Validación', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },

@@ -1,5 +1,5 @@
 const trainingModel = require('../models/trainingModel')
-
+const staffModel = require('../models/staffModel')
 const getAll = async(req,res)=>{
     try{
         const trainings = await trainingModel.getAll()
@@ -75,6 +75,41 @@ const getByStaffId = async(req,res)=>{
     }
 }
 
+const getByStaffActive = async(req,res)=>{
+    try{
+        const {id} = req.user
+        const id_user = id
+        const extisStaff = await staffModel.getByUserId(id_user)
+        if(!extisStaff){
+            return res.status(404).json({
+                status:'Error',
+                mensaje:'No es un miembro del personal'
+            })
+        }
+
+        const id_staff = extisStaff.id_staff
+        const trainings = await trainingModel.getByStaffId(id_staff)
+        if(trainings.length === 0){
+            return res.status(404).json({
+                status:'Error',
+                mensaje:'No hay entrenamientos registrados de este miembro'
+            })
+        }
+
+        return res.status(200).json({
+            status:'Success',
+            mensaje:'Consulta exitosa',
+            entrenamientos:trainings
+        })
+    }catch(error){
+        console.log(error)
+        return res.status(500).json({
+            status:'Error',
+            mensaje:'No es posible obtener los entrenamientos'
+        })
+    }
+}
+
 const getByLocation = async(req,res)=>{
     try{
         const {location} = req.body
@@ -113,14 +148,6 @@ const create = async(req,res)=>{
             return res.status(400).json({
                 status:'Error',
                 mensaje:'Es requerida toda la informacion'
-            })
-        }
-
-        const existsTraining = await trainingModel.getTrainingInTimeAnDate(time,date)
-        if(existsTraining.length >= 1){
-            return res.status(400).json({
-                status:'Error',
-                mensaje:'Ya existe este entrenamiento'
             })
         }
 
@@ -215,6 +242,7 @@ module.exports = {
     getById,
     getByStaffId,
     getByLocation,
+    getByStaffActive,
     create,
     update,
     deleteTraining

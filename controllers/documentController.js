@@ -2,7 +2,7 @@ const documentModel = require('../models/documentModel')
 const fs = require('fs')
 const path = require('path')
 
-const isAdminRole = (role) => [1, 2, 3].includes(Number(role))
+const isDocumentViewerRole = (role) => [1, 2, 3, 4, 5, 6, 7].includes(Number(role))
 
 const safeDownloadName = (value) => {
     const raw = String(value ?? '').trim()
@@ -69,7 +69,7 @@ const getById = async(req,res)=>{
 
 const getByUserDocument = async(req,res)=>{
     try{
-        const document = req.query?.document ?? req.body?.document
+        const document = (req.query?.document ?? req.body?.document)
         if(!document){
             return res.status(400).json({
                 status:'Error',
@@ -254,7 +254,7 @@ const downloadById = async (req, res) => {
         const requesterRole = req.user?.role
 
         const isOwner = Number(existing.id_user) === Number(requesterId)
-        if (!isOwner && !isAdminRole(requesterRole)) {
+        if (!isOwner && !isDocumentViewerRole(requesterRole)) {
             return res.status(403).json({
                 status: 'Error',
                 mensaje: 'No autorizado para descargar este documento'

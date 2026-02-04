@@ -179,8 +179,8 @@ const updateByStaff = async(req,res)=>{
     try{
         const {id} = req.user
         const id_user = id
-        const {date,address,blood_type,information,description} = req.body
-        if(!date || !address || !blood_type || !information || !description){
+        const {address,information,description} = req.body
+        if(!address || !information || !description){
             return res.status(400).json({
                 status:'Error',
                 mensaje:'Es requerida toda la informacion'
@@ -194,7 +194,7 @@ const updateByStaff = async(req,res)=>{
             })
         }
 
-        const staff = await staffModel.updateByStaff(date,address,blood_type,information,description,id_user)
+        const staff = await staffModel.updateByStaff(address,information,description,id_user)
         return res.status(200).json({
             status:'Success',
             mensaje:'Miembro actualizado con exito',

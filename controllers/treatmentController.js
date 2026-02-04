@@ -1,5 +1,6 @@
 const treatmentModel = require('../models/treatmentModel')
 const staffModel = require('../models/staffModel')
+const athleteModel = require('../models/athleteModel')
 const getAll = async(req,res)=>{
     try{
         const treatments = await treatmentModel.getAll()
@@ -48,7 +49,7 @@ const getById = async(req,res)=>{
 
 const getByDocumentStaff = async(req,res)=>{
     try{
-        const {document} = req.body   
+        const document = (req.query?.document ?? req.body?.document)
         if(!document){
             return res.status(400).json({
                 status:'Error',
@@ -77,7 +78,7 @@ const getByDocumentStaff = async(req,res)=>{
 
 const getByNameStaff = async(req,res)=>{
     try{
-        const {name} = req.body
+        const name = (req.query?.name ?? req.body?.name)
         if(!name){
             return res.status(400).json({
                 status:'Error',
@@ -106,7 +107,7 @@ const getByNameStaff = async(req,res)=>{
 
 const getByLastNameStaff = async(req,res)=>{
     try{
-        const {lastname} = req.body
+        const lastname = (req.query?.lastname ?? req.body?.lastname)
         if(!lastname){
             return res.status(400).json({
                 status:'Error',
@@ -135,7 +136,7 @@ const getByLastNameStaff = async(req,res)=>{
 
 const getByDocumentAthlete = async(req,res)=>{
     try{
-        const {document} = req.body   
+        const document = (req.query?.document ?? req.body?.document)
         if(!document){
             return res.status(400).json({
                 status:'Error',
@@ -164,7 +165,7 @@ const getByDocumentAthlete = async(req,res)=>{
 
 const getByNameAthlete = async(req,res)=>{
     try{
-        const {name} = req.body
+        const name = (req.query?.name ?? req.body?.name)
         if(!name){
             return res.status(400).json({
                 status:'Error',
@@ -193,7 +194,7 @@ const getByNameAthlete = async(req,res)=>{
 
 const getByLastNameAthlete = async(req,res)=>{
     try{
-        const {lastname} = req.body
+        const lastname = (req.query?.lastname ?? req.body?.lastname)
         if(!lastname){
             return res.status(400).json({
                 status:'Error',
@@ -255,8 +256,15 @@ const getByStaffActive = async(req,res)=>{
 const getByAthletActive = async(req,res)=>{
     try{
         const {id} = req.user
-        const id_athlete = id
-        const treatments = await treatmentModel.getByIdAthlete(id_athlete)
+        const id_user = id
+        const athlete = await athleteModel.getByUserId(id_user)
+        if(!athlete){
+            return res.status(404).json({
+                status:'Error',
+                mensaje:'No existe este deportista'
+            })
+        }
+        const treatments = await treatmentModel.getByIdAthlete(athlete.id_athlete)
         if(treatments.length === 0){
             return res.status(404).json({
                 status:'Error',

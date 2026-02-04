@@ -30,8 +30,8 @@ const update = async(date,address,blood_type,information,description,id_staff) =
     return result.rows[0]
 }
 
-const updateByStaff = async(date,address,blood_type,information,description,id_user) => {
-    const result = await pool.query('UPDATE staff SET date = $1, address = $2, blood_type = $3, information = $4, description = $5 WHERE id_user = $6 RETURNING *',[date,address,blood_type,information,description,id_user])
+const updateByStaff = async(address,information,description,id_user) => {
+    const result = await pool.query('UPDATE staff SET address = $1, information = $2, description = $3 WHERE id_user = $4 RETURNING *',[address,information,description,id_user])
     return result.rows[0]
 }
 

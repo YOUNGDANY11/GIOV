@@ -50,7 +50,7 @@ const getById = async(req,res)=>{
 
 const getByUserDocument = async(req,res)=>{
     try{
-        const {document} = req.body
+        const document = (req.query?.document ?? req.body?.document)
 
         if(!document){
             return res.status(400).json({
@@ -73,6 +73,7 @@ const getByUserDocument = async(req,res)=>{
             atleta:athlete
         })
     }catch(error){
+        console.log(error)
         return res.status(500).json({
             status:'Error',
             mensaje:'No se pudo obtener el atleta'

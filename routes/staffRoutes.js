@@ -13,9 +13,9 @@ router.delete('/id/:id', auth,  roleMiddleware(1,2,3), staffController.deleteSta
 
 
 //Entrenador, Medico general, fisio, quiropractico,
-router.get('/active', auth, roleMiddleware(4,5,6,7), staffController.getByUserActive)
-router.post('/active', auth, roleMiddleware(4,5,6,7), staffController.create)
-router.put('/active', auth, roleMiddleware(4,5,6,7), staffController.updateByStaff)
+router.get('/active', auth, roleMiddleware(2,3,4,5,6,7), staffController.getByUserActive)
+router.post('/active', auth, roleMiddleware(2,3,4,5,6,7), staffController.create)
+router.put('/active', auth, roleMiddleware(2,3,4,5,6,7), staffController.updateByStaff)
 
 
-module.exports = router
+module.exports = router 
